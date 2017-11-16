@@ -1,0 +1,20 @@
+{
+  "name": "oonix-render-farm",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Michael Taylor",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.149.0",
+    "fs-extra": "^4.0.2",
+    "moment": "^2.19.2",
+    "node-localstorage": "^1.3.0",
+    "ramda": "^0.25.0",
+    "ssh-exec": "^2.0.0",
+    "tree-kill": "^1.2.0"
+  }
+}

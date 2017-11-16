@@ -1,0 +1,89 @@
+.modal-layout {
+  background-color: #eeeeee; 
+  height: 100vh;
+  overflow: scroll;
+}
+
+.logo-content {
+  display: flex;
+}
+
+.logo-content-title {
+  height: 20px;
+  align-self: center;
+}
+
+.header-bar {
+  position: fixed;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 10px;
+  color: black;
+}
+
+.header-bar a {
+  color: black;
+}
+
+.header-bar img {
+  height: 58px;
+  padding-right: 17px;
+}
+
+.header-bar a {
+  right: 40px;
+  position: absolute;
+}
+
+.model-layout-content {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content-card {
+  width: 300px;
+  height: 500px;
+  position: relative;
+}
+
+@media only screen and (orientation: landscape) and (max-width: 720px) {
+  .content-card > div {
+    position: relative;
+  }
+}
+
+@media only screen and (max-width: 502px),
+only screen and (orientation: landscape) and (max-width: 720px)  {
+  .content-card {
+    width: 92vw;
+    height: 93vh;
+    overflow: auto;
+  }
+
+  .logo-content {
+    display: none;
+  }
+
+  .header-bar {
+    justify-content: center;
+    padding: 0;
+    padding-top: 16px;
+    position: relative;
+  }
+
+  .header-bar a {
+    right: 0;
+    position: relative;
+  }
+
+  .model-layout-content {
+    height: 95vh;
+  }
+}
+
+.modal-layout a:link {
+  text-decoration: none;
+}

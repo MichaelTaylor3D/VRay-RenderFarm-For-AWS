@@ -1,0 +1,121 @@
+<html>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <script
+            src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+            integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+    <script>
+        function getKey(){
+          var url = window.location.pathname;
+
+          var url_parts = url.replace(/\/\s*$/,'').split('/');
+          return url_parts[2];
+        }
+        function openApp(session){
+          var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+          // Windows Phone must come first because its UA also contains "Android"
+          if (/windows phone/i.test(userAgent)) {
+            return true;
+          }
+
+          if (/android/i.test(userAgent)) {
+            return true;
+          }
+
+          // iOS detection from: http://stackoverflow.com/a/9039885/177710
+          if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+              setTimeout(function () {
+                window.location = "viddyme://?sessionId=" + session._id + "&type=openQuestion";
+                setTimeout(function () {
+                  // Link to the App Store should go here -- only fires if deep link fails
+                  window.location = "https://itunes.apple.com/us/app/myapp/id123456789?ls=1&mt=8";
+                }, 500);
+              }, 500);
+
+          }
+
+          return false;
+        }
+
+      $.ajax({
+        url: "https://viddy-dev.herokuapp.com/sessions/public",
+        contentType: "application/json",
+        data: {
+          publicKey: getKey()
+        }
+      }).done(function (response) {
+        var docs = _.get(response, 'docs');
+        if (docs) {
+          var session = _.head(docs);
+          $("#mp4Source").attr("src", (session.intro.mp4))
+          var vid = document.getElementById("main-video")
+          vid.load();
+          vid.play()
+          $("#title").text(session.title)
+          $("#description").text(session.description)
+          $( ".open-app" ).click(function() {
+            openApp(session)
+          });
+        }
+
+      });
+    </script>
+<body>
+
+<div class="container-fluid">
+<div id="message"></div>
+    <div class="row">
+        <div class="span6" style="float: none; margin: 0 auto;">
+            <div class="card-header">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm">
+                            <button href="#" class="btn btn-link btn-lg" >Viddy.me</button>
+                        </div>
+                        <div class="col-sm">
+                            <button href="#" class="btn btn-link btn-lg open-app" >Open in app</button>
+                        </div>
+                        <div class="col-sm">
+                            <button class="btn btn-outline-success btn-lg my-2 float-right open-app" type="submit">Download</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm">
+                        <h4 id="title" class="card-title"></h4>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <p id="description" class="card-text"></p>
+
+            <div class="card" style="width: 100%;">
+                <video class="card-img-top" id="main-video" width="100%" height="360" controls>
+                    <source id="mp4Source" src="movie.mp4" type="video/mp4">
+
+                    Your browser does not support the video tag.
+                </video>
+
+                <div class="card-body">
+                    <button href="#" class="btn btn-primary open-app">Begin Interview</button>
+                    <p class="d-inline">Works only on the <strong>iphone</strong>. Android is coming soon.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+
+.welcome-msg {
+  margin-top: 33px;
+  line-height: 0.2;
+  text-align: center;
+}
+
+.welcome-msg img {
+  width: 100px;
+}
+
+.input-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.input {
+  width: calc(100% - 25px) !important;
+}
+
+.login-btn {
+  width: 100%;
+  margin: 11px;
+  z-index: 100;
+}
+
+.cloud-left {
+  position: absolute;
+  top: calc(100% - 65px);
+  z-index: 1;
+}
+
+.cloud-right {
+  position: absolute;
+  right: 0;
+  top: calc(100% - 45px);
+  z-index: 1;
+}

@@ -1,0 +1,28 @@
+{
+  "name": "app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "alt": "^0.18.6",
+    "history": "^4.7.2",
+    "material-ui": "^0.19.4",
+    "mobx": "^3.3.1",
+    "mobx-localstorage": "^0.1.7",
+    "mobx-react": "^4.3.4",
+    "react": "^16.1.0",
+    "react-dom": "^16.1.0",
+    "react-form-validator-core": "^0.1.1",
+    "react-material-ui-form-validator": "^1.0.1",
+    "react-router-dom": "^4.2.2",
+    "react-scripts": "1.0.17",
+    "react-tap-event-plugin": "^3.0.2",
+    "recordrtc": "^5.4.5",
+    "superagent": "^3.8.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}
