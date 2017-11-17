@@ -1,4 +1,4 @@
-const R = require('ramda');
+const { compose, filter, map} = require('ramda');
 const fs = require('fs-extra');
 const path = require('path')
 const ec2 = require('./aws-instances');
@@ -12,7 +12,8 @@ const isDirectory = (source) => {
 
 const getFoldersFromSource = async (source) => {
   return await fs.readdir(source).then(folderContents => {
-    return folderContents.map(name => path.join(source, name)).filter(isDirectory);
+    const filterMap = compose(filter(isDirectory), map(name => path.join(source, name)));
+    return filterMap(folderContents);
   });  
 }
 

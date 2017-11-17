@@ -84,6 +84,71 @@ exports.workersAreActive = async () => {
   return workerCount.length !== 0;
 }
 
+exports.createNewOLS = async () => {
+  const securityGroupId = 'sg-0f374f7d';
+  const subNetId = 'subnet-3baa4614'
+
+  var params = {
+    ImageId: 'ami-a28704d8',
+    InstanceType: 't2.large',
+    MinCount: 1,
+    MaxCount: 1,
+    NetworkInterfaces: [{
+        AssociatePublicIpAddress: true,
+        DeleteOnTermination: true,
+        Description: 'Primary network interface',
+        DeviceIndex: 0,
+        SubnetId: subNetId,
+        Groups: [securityGroupId]          
+    }],
+  };
+
+  let privateIpAddress;
+
+  await ec2.runInstances(params).promise().then(data => {
+    data.Instances.forEach(instance => {
+      const instanceInfo = {
+        instanceId: instance.InstanceId,
+        ipAddress: instance.NetworkInterfaces[0].PrivateIpAddress
+      };  
+      privateIpAddress = instanceInfo.ipAddress;
+
+      const {instanceId} = instanceInfo;      
+      params = {Resources: [instanceId], Tags: [{
+          Key: 'Name',
+          Value: 'VRay License Server (Remote Started)'
+        }]
+      };  
+      return ec2.createTags(params).promise();
+    });
+  });
+
+  console.log('Waiting 30 seconds to retreive OLS instance data...');
+  await wait3Seconds();
+  const data = await describeInstances();
+  
+  data.Reservations.forEach(reservation => {
+    reservation.Instances.forEach(instance => {
+      if (instance.PrivateIpAddress === privateIpAddress) {
+        console.log('');
+        console.log("Created OLS at ", instance.PublicIpAddress);  
+        console.log(`After about 5 mins frontend will be available at http://${instance.PublicIpAddress}:8080`);
+        console.log(`You may also remote desktop at ${instance.PublicIpAddress}`);
+        console.log(`    username: Administrator`);
+        console.log(`    password: cL3$D?zyeLMTF99AAvS*Q3VI;x!A.;(G`);
+      }
+    });
+  });
+}
+
+const wait3Seconds = async () => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, 30000);
+  });
+}
+
 exports.createWorkers = async () => {
   const olsInstance = await getOLSInstanceInfo();
   const securityGroupId = olsInstance.SecurityGroups[0].GroupId;
@@ -99,7 +164,7 @@ exports.createWorkers = async () => {
         DeleteOnTermination: true,
         Description: 'Primary network interface',
         DeviceIndex: 0,
-        SubnetId: subnetId,
+        SubnetId: subNetId,
         Groups: [securityGroupId]          
     }],
   };
@@ -124,6 +189,36 @@ exports.createWorkers = async () => {
 
 exports.workersStatusIsOk = async () => {
   return await ec2.waitFor('instanceStatusOk', params).promise();
+}
+
+const getAllInstanceIds = async () => {
+  const instanceInfo = await describeInstances();
+  const instanceIds = [];
+
+  instanceInfo.Reservations.forEach(reservation => {
+    reservation.Instances.forEach(instance => {
+      instance.Tags.forEach(tag => {
+          instanceIds.push(instance.InstanceId);
+      });
+    });
+  });
+
+  return instanceIds;
+}
+
+exports.terminateEntireFarm = async () => {
+  const instanceIds = await getAllInstanceIds();
+  
+  instanceIds.forEach(instance => {
+    ec2.terminateInstances({ InstanceIds: [instance] }).promise()
+      .then(data => {
+        for(var i in data.TerminatingInstances) {
+          var instance = data.TerminatingInstances[i];
+          console.log('TERMINATE:\t' + instance.InstanceId);                
+        } 
+      }).catch(error => console.log(err));
+    }
+  );
 }
 
 exports.terminateAllWorkers = async () => {
