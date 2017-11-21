@@ -14,13 +14,13 @@ const start = async () => {
     await folderWatcher.watchFolderForNewProjects();
     const project = await projectManager.getPathToNextProject()
     if (!_.isEmpty(project)) {
+      console.log('Found New Project to Render');
       const userData = await projectManager.getUserDataFromFolder(project);
       const workersAreActive = await ec2.workersAreActive();
       if (!workersAreActive) {
-        await ec2.createWorkers(userData);
-        await ec2.workersStatusIsOk();
+        await ec2.createWorkers(userData);      
       }
-      return;
+      await ec2.workersStatusIsOk();
       await ec2.configureRemoteWorkers();
       const renderedImagePath = await vray.startRender(userData, project);
       const fileDownload = await s3.uploadFile(renderedImagePath, userData);

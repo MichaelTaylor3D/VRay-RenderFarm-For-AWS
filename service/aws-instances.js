@@ -2,16 +2,12 @@ const _ = require('lodash');
 const path = require('path');
 const R = require('ramda');
 const remoteClient = require('scp2');
-// Load the AWS SDK for Node.js
 const AWS = require('aws-sdk');
-// Load credentials and set region from JSON file
+const fse = require('fs-extra');
+const exec = require('ssh-exec');
+
 AWS.config.loadFromPath('./aws-config.json');
-
-// Create EC2 service object
-ec2 = new AWS.EC2({apiVersion: '2016-11-15'});
-
-fse = require('fs-extra')
-const exec = require('ssh-exec')
+const ec2 = new AWS.EC2({apiVersion: '2016-11-15'});
 
 const config = require('./config.json');
 const olsAmiId = 'ami-a28704d8';
@@ -22,7 +18,7 @@ const describeInstances = async () => {
 
 const instanceIsNotShuttingDown = (instance) => {
   const ignoreStatus = ['stopped', 'terminated', 'shutting-down'];
-  return !R.contains(ignoreStatus, instance.State.Name);
+  return !ignoreStatus.includes(instance.State.Name);
 }
 
 const isInstanceARenderNode = (instance) => {
@@ -41,7 +37,7 @@ const getActiveWorkerIpList = async () => {
 
   const ipAddresses = getPrivateIpAddresses(instanceInfo.Reservations);
 
-  return Promise.resolve(ipAddresses);
+  return ipAddresses;
 }
 
 exports.getActiveWorkerIpList = getActiveWorkerIpList;
@@ -85,13 +81,13 @@ const getOLSInstanceInfo = async () => {
   );
 
   const olsInstance = findOlsInstance(instanceInfo.Reservations);
-  console.log('!');
+
   if (!olsInstance) {
     return createNewOLS()
       .then((instanceId) => olsStatusOk(instanceId))
       .then(() => getOLSInstanceInfo());
   } 
-  console.log('Using OLS instance:' + olsInstance.instanceId);
+  console.log('Using OLS instance: ' + olsInstance.InstanceId);
   return Promise.resolve(olsInstance);
 }
 
@@ -151,10 +147,10 @@ const createNewOLS = async () => {
         instanceId = instance.InstanceId;
         console.log('');
         console.log("Created OLS at ", instance.PublicIpAddress);  
-        console.log(`After about 5 mins frontend will be available at http://${instance.PublicIpAddress}:8080`);
-        console.log(`You may also remote desktop at ${instance.PublicIpAddress}`);
-        console.log(`    username: Administrator`);
-        console.log(`    password: cL3$D?zyeLMTF99AAvS*Q3VI;x!A.;(G`);
+        //console.log(`After about 5 mins frontend will be available at http://${instance.PublicIpAddress}:8080`);
+        //console.log(`You may also remote desktop at ${instance.PublicIpAddress}`);
+        //console.log(`    username: Administrator`);
+        //console.log(`    password: cL3$D?zyeLMTF99AAvS*Q3VI;x!A.;(G`);
       }
     });
   });
@@ -182,10 +178,12 @@ const waitSeconds = async (seconds) => {
 
 exports.createWorkers = async (userData) => {
   const olsInstance = await getOLSInstanceInfo();
-  console.log(olsInstance.PublicIpAddress);
+
+  console.log('Creating new set of workers');
+ 
   const securityGroupId = olsInstance.SecurityGroups[0].GroupId;
   const subNetId = olsInstance.SubnetId
-return;
+
   const params = {
     ImageId: 'ami-7b1cad01',
     InstanceType: userData.type,
@@ -209,24 +207,30 @@ return;
       };  
       console.log("Created instance", instanceInfo);  
       const {instanceId} = instanceInfo;      
-      params = {Resources: [instanceId], Tags: [{
+      const tagParams = {Resources: [instanceId], Tags: [{
           Key: 'Name',
           Value: 'VRay Render Node'
         }]
       };  
-      return ec2.createTags(params).promise();
+      return ec2.createTags(tagParams).promise();
     });
   });
 }
 
 const olsStatusOk = async (instanceId) => {
-  var params = {
+  console.log('Waiting for OLS to fully come online');
+  const params = {
     InstanceIds: [instanceId]
   };
   return await ec2.waitFor('instanceStatusOk', params).promise();
 }
 
 const workersStatusIsOk = async () => {
+  const workerInstanceIds = await getActiveWorkerInstanceIds();
+  console.log('Waiting for workers to fully come online');
+  const params = {
+    InstanceIds: workerInstanceIds
+  };
   return await ec2.waitFor('instanceStatusOk', params).promise();
 }
 
@@ -279,13 +283,13 @@ exports.terminateAllWorkers = async () => {
 
 exports.configureRemoteWorkers = async (userInfo, filePath) => {
   const workerIpAddresses = await getActiveWorkerIpList();
-  console.log(workerIpAddresses);
+  console.log('Sending VRLClient to ' + workerIpAddresses);
   return new Promise((resolve, reject) => {
-    workerIpAddresses.forEach(ipAddress => {
+    workerIpAddresses.forEach((ipAddress, index) => {
       remoteClient.scp(config.vrlclient, {
         host: ipAddress,
         username: 'ec2-user',
-        privateKey: fs.readFileSync('./RenderFarm.pem'),
+        privateKey: fse.readFileSync('./RenderFarm.pem'),
         path: '/home/ec2-user/.ChaosGroup/'
       }, (err) => {
         if (err) reject(err);
