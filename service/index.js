@@ -18,7 +18,7 @@ const start = async () => {
       const workersAreActive = await ec2.workersAreActive();
       if (!workersAreActive) {
         await ec2.createWorkers(userData);
-        //await ec2.workersStatusIsOk();
+        await ec2.workersStatusIsOk();
       }
       return;
       await ec2.configureRemoteWorkers();

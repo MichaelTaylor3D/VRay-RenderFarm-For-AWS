@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const path = require('path');
+const R = require('ramda');
 const remoteClient = require('scp2');
 // Load the AWS SDK for Node.js
 const AWS = require('aws-sdk');
@@ -19,82 +20,79 @@ const describeInstances = async () => {
   return ec2.describeInstances().promise(); 
 }
 
+const instanceIsNotShuttingDown = (instance) => {
+  const ignoreStatus = ['stopped', 'terminated', 'shutting-down'];
+  return !R.contains(ignoreStatus, instance.State.Name);
+}
+
+const isInstanceARenderNode = (instance) => {
+  return instanceIsNotShuttingDown(instance) 
+  && R.contains({Key: 'Name', Value: 'VRay Render Node'}, instance.Tags);
+}
+
 const getActiveWorkerIpList = async () => {
   const instanceInfo = await describeInstances();
-  return new Promise((resolve, reject) => {
-    const ipAddresses = [];
-    const ignoreStatus = ['stopped', 'terminated', 'shutting-down'];
-  
-    instanceInfo.Reservations.forEach(reservation => {
-      reservation.Instances.forEach(instance => {
-        instance.Tags.forEach(tag => {
-          if (tag.Value === 'VRay Render Node' ) {
-            if(!ignoreStatus.includes(instance.State.Name)) {
-              ipAddresses.push(instance.PrivateIpAddress);
-            }          
-          }
-        });
-      });
-    });
-    resolve(ipAddresses);
-  });
+
+  const getPrivateIpAddresses = R.compose(
+    R.map(instance => instance.PrivateIpAddress),
+    R.filter(instance => isInstanceARenderNode(instance)),
+    R.chain(reservation => reservation.Instances)
+  );
+
+  const ipAddresses = getPrivateIpAddresses(instanceInfo.Reservations);
+
+  return Promise.resolve(ipAddresses);
 }
+
+exports.getActiveWorkerIpList = getActiveWorkerIpList;
 
 const getActiveWorkerInstanceIds = async () => {
   const instanceInfo = await describeInstances();
-  const instanceIds = [];
+  
+  const getWorkerIds = R.compose(
+    R.map(instance => instance.InstanceId),
+    R.filter(instance => isInstanceARenderNode(instance)),
+    R.chain(reservation => reservation.Instances)
+  );
 
-  instanceInfo.Reservations.forEach(reservation => {
-    reservation.Instances.forEach(instance => {
-      instance.Tags.forEach(tag => {
-        if (tag.Value === 'VRay Render Node' ) {
-          instanceIds.push(instance.InstanceId);
-        }
-      });
-    });
-  });
+  const workerIds = getWorkerIds(instanceInfo.Reservations);
 
-  return instanceIds;
+  return Promise.resolve(workerIds);
 }
+
+exports.getActiveWorkerInstanceIds = getActiveWorkerInstanceIds;
 
 const getActiveWorkerCount = async () => {
   const instanceInfo = await describeInstances();
-  let workerCount = 0;
- 
-  instanceInfo.Reservations.forEach(reservation => {
-    reservation.Instances.forEach(instance => {
-      instance.Tags.forEach(tag => {
-        if (tag.Value === 'VRay Render Node' ) {
-          workerCount++;
-        }
-      });
-    });
-  });
 
-  return workerCount;
+  const getWorkerCount = R.compose(
+    R.length,
+    R.filter(tag => tag.Value.includes('VRay Render Node')),
+    R.chain(instance => instance.Tags),
+    R.filter(instance => instanceIsNotShuttingDown(instance)),
+    R.chain(reservation => reservation.Instances)
+  );
+
+  return Promise.resolve(getWorkerCount(instanceInfo.Reservations));
 }
 
 const getOLSInstanceInfo = async () => {
   const instanceInfo = await describeInstances();
-  const ignoreStatus = ['stopped', 'terminated', 'shutting-down'];
 
-  return new Promise((resolve, reject) => {
-    let olsInstance;
-    instanceInfo.Reservations.forEach(reservation => {
-      reservation.Instances.forEach(instance => {
-        if (instance.ImageId === olsAmiId && !ignoreStatus.includes(instance.State.Name)) {
-          olsInstance = instance;       
-        }
-      });
-    });
-    if (olsInstance) {
-      resolve(olsInstance);
-    } else {
-      return createNewOLS()
-        .then((instanceId) => olsStatusOk(instanceId))
-        .then(() => getOLSInstanceInfo());
-    }
-  })
+  const findOlsInstance = R.compose(
+    R.find(instance => instance.ImageId === olsAmiId && instanceIsNotShuttingDown(instance)),
+    R.chain(reservation => reservation.Instances)    
+  );
+
+  const olsInstance = findOlsInstance(instanceInfo.Reservations);
+  console.log('!');
+  if (!olsInstance) {
+    return createNewOLS()
+      .then((instanceId) => olsStatusOk(instanceId))
+      .then(() => getOLSInstanceInfo());
+  } 
+  console.log('Using OLS instance:' + olsInstance.instanceId);
+  return Promise.resolve(olsInstance);
 }
 
 exports.workersAreActive = async () => {
@@ -160,7 +158,7 @@ const createNewOLS = async () => {
       }
     });
   });
-  console.log(instanceId);
+
   return Promise.resolve(instanceId);
 }
 
@@ -236,18 +234,18 @@ exports.workersStatusIsOk = workersStatusIsOk;
 
 const getAllInstanceIds = async () => {
   const instanceInfo = await describeInstances();
-  const instanceIds = [];
 
-  instanceInfo.Reservations.forEach(reservation => {
-    reservation.Instances.forEach(instance => {
-      instance.Tags.forEach(tag => {
-          instanceIds.push(instance.InstanceId);
-      });
-    });
-  });
+  const getInstanceIds = R.compose(
+    R.map(instance => instance.InstanceId),
+    R.chain(reservation => reservation.Instances)
+  );
 
-  return instanceIds;
+  const instanceIds = getInstanceIds(instanceInfo.Reservations);
+
+  return Promise.resolve(instanceIds);
 }
+
+exports.getAllInstanceIds = getAllInstanceIds;
 
 exports.terminateEntireFarm = async () => {
   const instanceIds = await getAllInstanceIds();
