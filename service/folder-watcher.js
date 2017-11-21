@@ -1,4 +1,4 @@
-const { compose, filter, map} = require('ramda');
+const { compose, filter, map } = require('ramda');
 const fs = require('fs-extra');
 const path = require('path')
 const ec2 = require('./aws-instances');
@@ -11,10 +11,14 @@ const isDirectory = (source) => {
 }
 
 const getFoldersFromSource = async (source) => {
-  return await fs.readdir(source).then(folderContents => {
-    const filterMap = compose(filter(isDirectory), map(name => path.join(source, name)));
-    return filterMap(folderContents);
-  });  
+  try {
+    return await Promise.resolve(fs.readdir(source).then(folderContents => {
+      const filterMap = compose(filter(isDirectory), map(name => path.join(source, name)));
+      return filterMap(folderContents);
+    }));
+  } catch(error) {
+    return Promise.reject('Source folder does not exist');
+  }
 }
 
 exports.getFoldersFromSource = getFoldersFromSource;
@@ -32,7 +36,8 @@ const wait30Seconds = async () => {
   });
 }
 
-const watchFolderForNewProjects = async () => {  
+const watchFolderForNewProjects = async () => {
+  console.log('Looking for new projects...');
   const foundProject = await foldersExistInSource(uploadDir);
   if(!foundProject) {
 
@@ -44,7 +49,7 @@ const watchFolderForNewProjects = async () => {
     await wait30Seconds();
     return await watchFolderForNewProjects();
   } else {
-    return true;
+    return Promise.resolve(true);
   }
 };
 

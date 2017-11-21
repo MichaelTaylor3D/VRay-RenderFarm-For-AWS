@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const path = require('path');
+const remoteClient = require('scp2');
 // Load the AWS SDK for Node.js
 const AWS = require('aws-sdk');
 // Load credentials and set region from JSON file
@@ -11,27 +12,32 @@ ec2 = new AWS.EC2({apiVersion: '2016-11-15'});
 fse = require('fs-extra')
 const exec = require('ssh-exec')
 
+const config = require('./config.json');
+const olsAmiId = 'ami-a28704d8';
+
 const describeInstances = async () => {
   return ec2.describeInstances().promise(); 
 }
 
 const getActiveWorkerIpList = async () => {
   const instanceInfo = await describeInstances();
-  const ipAddresses = [];
-  const ignoreStatus = ['stopped', 'terminated', 'shutting-down'];
-
-  instanceInfo.Reservations.forEach(reservation => {
-    reservation.Instances.forEach(instance => {
-      instance.Tags.forEach(tag => {
-        if (tag.Value === 'VRay Render Node' ) {
-          if(!ignoreStatus.includes(instance.State.Name)) {
-            ipAddresses.push(instance.PrivateIpAddress);
-          }          
-        }
+  return new Promise((resolve, reject) => {
+    const ipAddresses = [];
+    const ignoreStatus = ['stopped', 'terminated', 'shutting-down'];
+  
+    instanceInfo.Reservations.forEach(reservation => {
+      reservation.Instances.forEach(instance => {
+        instance.Tags.forEach(tag => {
+          if (tag.Value === 'VRay Render Node' ) {
+            if(!ignoreStatus.includes(instance.State.Name)) {
+              ipAddresses.push(instance.PrivateIpAddress);
+            }          
+          }
+        });
       });
     });
+    resolve(ipAddresses);
   });
-  return ipAddresses;
 }
 
 const getActiveWorkerInstanceIds = async () => {
@@ -70,27 +76,39 @@ const getActiveWorkerCount = async () => {
 
 const getOLSInstanceInfo = async () => {
   const instanceInfo = await describeInstances();
-  instanceInfo.Reservations.forEach(reservation => {
-    reservation.Instances.forEach(instance => {
-      if (instance.ImageId === 'ami-1ecb7164') {
-       return instance;
-      }
+  const ignoreStatus = ['stopped', 'terminated', 'shutting-down'];
+
+  return new Promise((resolve, reject) => {
+    let olsInstance;
+    instanceInfo.Reservations.forEach(reservation => {
+      reservation.Instances.forEach(instance => {
+        if (instance.ImageId === olsAmiId && !ignoreStatus.includes(instance.State.Name)) {
+          olsInstance = instance;       
+        }
+      });
     });
-  });
+    if (olsInstance) {
+      resolve(olsInstance);
+    } else {
+      return createNewOLS()
+        .then((instanceId) => olsStatusOk(instanceId))
+        .then(() => getOLSInstanceInfo());
+    }
+  })
 }
 
 exports.workersAreActive = async () => {
   const workerCount = await getActiveWorkerCount();
-  return workerCount.length !== 0;
+  return workerCount != 0;
 }
 
-exports.createNewOLS = async () => {
+const createNewOLS = async () => {
   const securityGroupId = 'sg-0f374f7d';
   const subNetId = 'subnet-3baa4614'
-
+  
   var params = {
-    ImageId: 'ami-a28704d8',
-    InstanceType: 't2.large',
+    ImageId: olsAmiId,
+    InstanceType: 't2.nano', //'t2.large',
     MinCount: 1,
     MaxCount: 1,
     NetworkInterfaces: [{
@@ -126,10 +144,13 @@ exports.createNewOLS = async () => {
   console.log('Waiting 30 seconds to retreive OLS instance data...');
   await wait3Seconds();
   const data = await describeInstances();
+
+  let instanceId;
   
   data.Reservations.forEach(reservation => {
     reservation.Instances.forEach(instance => {
       if (instance.PrivateIpAddress === privateIpAddress) {
+        instanceId = instance.InstanceId;
         console.log('');
         console.log("Created OLS at ", instance.PublicIpAddress);  
         console.log(`After about 5 mins frontend will be available at http://${instance.PublicIpAddress}:8080`);
@@ -139,7 +160,11 @@ exports.createNewOLS = async () => {
       }
     });
   });
+  console.log(instanceId);
+  return Promise.resolve(instanceId);
 }
+
+exports.createNewOLS = createNewOLS;
 
 const wait3Seconds = async () => {
   return new Promise((resolve, reject) => {
@@ -149,16 +174,25 @@ const wait3Seconds = async () => {
   });
 }
 
-exports.createWorkers = async () => {
+const waitSeconds = async (seconds) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, seconds);
+  });
+}
+
+exports.createWorkers = async (userData) => {
   const olsInstance = await getOLSInstanceInfo();
+  console.log(olsInstance.PublicIpAddress);
   const securityGroupId = olsInstance.SecurityGroups[0].GroupId;
   const subNetId = olsInstance.SubnetId
-
-  var params = {
+return;
+  const params = {
     ImageId: 'ami-7b1cad01',
-    InstanceType: 't2.2xlarge',
+    InstanceType: userData.type,
     MinCount: 1,
-    MaxCount: 10,
+    MaxCount: userData.count,
     NetworkInterfaces: [{
         AssociatePublicIpAddress: true,
         DeleteOnTermination: true,
@@ -187,9 +221,18 @@ exports.createWorkers = async () => {
   });
 }
 
-exports.workersStatusIsOk = async () => {
+const olsStatusOk = async (instanceId) => {
+  var params = {
+    InstanceIds: [instanceId]
+  };
   return await ec2.waitFor('instanceStatusOk', params).promise();
 }
+
+const workersStatusIsOk = async () => {
+  return await ec2.waitFor('instanceStatusOk', params).promise();
+}
+
+exports.workersStatusIsOk = workersStatusIsOk;
 
 const getAllInstanceIds = async () => {
   const instanceInfo = await describeInstances();
@@ -237,20 +280,23 @@ exports.terminateAllWorkers = async () => {
 }
 
 exports.configureRemoteWorkers = async (userInfo, filePath) => {
-  const workerIpAddresses = await getActiveWorkerIpList().join(';');
+  const workerIpAddresses = await getActiveWorkerIpList();
+  console.log(workerIpAddresses);
   return new Promise((resolve, reject) => {
-    client.scp(config.vrlclient, {
-      host: instance.ipAddress,
-      username: 'ec2-user',
-      privateKey: fs.readFileSync('./RenderFarm.pem'),
-      path: '/home/ec2-user/.ChaosGroup/'
-    }, (err) => {
-      if (err) reject(err);
-      if (runningInstances.length === (index + 1)) {
-        setTimeout(() => {
-          resolve();
-        }, 5000);                
-      }
-    })
+    workerIpAddresses.forEach(ipAddress => {
+      remoteClient.scp(config.vrlclient, {
+        host: ipAddress,
+        username: 'ec2-user',
+        privateKey: fs.readFileSync('./RenderFarm.pem'),
+        path: '/home/ec2-user/.ChaosGroup/'
+      }, (err) => {
+        if (err) reject(err);
+        if (workerIpAddresses.length === (index + 1)) {
+          setTimeout(() => {
+            resolve();
+          }, 5000);                
+        }
+      })
+    });
   });
 }
