@@ -11,7 +11,7 @@ const AppDataSource = {
   ...sourceMethod('loginUser', AppActions, co.wrap(function* (state, {username, password}) {
     return yield request.post(`${host}/jwt-auth/v1/token`)
       .send({username, password})
-      .then((res) => ({token: res.body.token}))  
+      .then((res) => ({...res.body}))  
       .catch((error) => ({status: error.status, message: error.response.body.message}));  
   })),
 };
