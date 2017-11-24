@@ -34,7 +34,7 @@ const start = async () => {
       await ec2.workersStatusIsOk();
       await ec2.configureRemoteWorkers();
       const projectOutputFolder = await vray.startRender(userData, project);
-      const bundledProject = await projectManager.zipUpFolder(bundledProject);
+      const bundledProject = await projectManager.zipUpFolder(projectOutputFolder);
       const fileDownload = await s3.uploadFile(bundledProject, userData);
       email.file(fileDownload, userData.email);
     }
