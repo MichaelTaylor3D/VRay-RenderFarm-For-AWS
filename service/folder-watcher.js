@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const path = require('path')
 const ec2 = require('./aws-instances');
 const config = require('./config');
+const logger = require('./logger');
 
 const uploadDir = config.projectFolder;
 
@@ -37,7 +38,7 @@ const wait30Seconds = async () => {
 }
 
 const watchFolderForNewProjects = async () => {
-  console.log('Looking for new projects...');
+  logger.logInfo('Looking for new projects...');
   const foundProject = await foldersExistInSource(uploadDir);
   if(!foundProject) {
 
