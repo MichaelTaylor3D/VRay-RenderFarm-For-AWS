@@ -1,9 +1,7 @@
 const winston = require('winston');
-const { createLogger, format, transports } = require('winston');
-const { combine, timestamp, label, prettyPrint } = format;
 
 const logger = winston.createLogger({
-  format: combine(timestamp(), prettyPrint()),
+  format: winston.format.json(),
   transports: [
     new winston.transports.Console(),
     new winston.transports.File({ filename: 'log/error.log', level: 'error' }),
