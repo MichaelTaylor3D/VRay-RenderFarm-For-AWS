@@ -1,7 +1,6 @@
 const winston = require('winston');
 
 export default winston.createLogger({
-  format: winston.format.json(),
   transports: [
     new winston.transports.Console(),
     new winston.transports.File({ filename: 'log/error.log', level: 'error' }),
