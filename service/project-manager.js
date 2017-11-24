@@ -41,7 +41,13 @@ export const getUserDataFromFolder = async (folderPath) => {
     fs.readFile(folderPath + '/userData.json', (error, data) => {
       if (error) reject('User Data not found for this project');
       resolve(JSON.parse(data.toString()));
-    })
+    });
+  });
+}
+
+export const deleteProjectFoleder = async (folderPath) => {
+  rimraf(folderPath, (err) => {
+    if (err) console.log(err);
   });
 }
 
@@ -51,7 +57,6 @@ export const getVrSceneFilePath = async (folderPath) => {
 
 const isValidVrSceneFolder = async (folderPath) => {
   const folderContents = await fs.readdir(folderPath);
-  console.log(folderContents);
   const vrscene = folderContents.find(item => item.includes('.vrscene'));
   return Promise.resolve(vrscene);
 }
