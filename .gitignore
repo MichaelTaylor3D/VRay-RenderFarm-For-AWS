@@ -2,3 +2,4 @@ node_modules
 uploads/*
 !uploads/render-test
 output/*
+service/log/*

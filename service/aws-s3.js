@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const fs = require('fs-extra');
 const path = require('path');
+const logger = require('./logger');
 
 // Load the SDK for JavaScript
 var AWS = require('aws-sdk');
@@ -22,7 +23,7 @@ exports.uploadFile = async (filepath, {username}) => {
     const data = await s3.upload(uploadParams).promise();
     if (data) {
       const location = _.cloneDeep(data.Location)
-      console.log("Upload Success", location);
+      logger.logInfo("Upload Success", location);
       return Promise.resolve(location);
     }
   } catch (error) {

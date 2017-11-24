@@ -10,11 +10,13 @@ const projectManager = require('./project-manager');
 const email = require('./email-manager');
 const vray = require('./vray-manager');
 
+const logger = require('./logger');
+
 const LocalStorage = require('node-localstorage').LocalStorage;
 const localStorage = new LocalStorage('./scratch');
 
 const start = async () => {
-  console.log('restarting farm');
+  logger.logInfo('restarting farm');
   try {
     await vray.createVrlClientFile();
     await vray.loginToOLS();
@@ -22,7 +24,7 @@ const start = async () => {
     const project = await projectManager.getPathToNextProject()
 
     if (!_.isEmpty(project)) {
-      console.log('Found New Project to Render');
+      logger.logInfo('Found New Project to Render');
 
       const userData = await projectManager.getUserDataFromFolder(project);
       localStorage.setItem('currentUserEmail', userData.email);
@@ -48,7 +50,7 @@ const start = async () => {
 }
 
 const handleError = (error) => {
-  console.log('!: ' + error);
+  logger.logError('!: ' + error);
 
   const recipient = localStorage.getItem('currentUserEmail');
   if (recipient) {

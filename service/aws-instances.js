@@ -5,6 +5,7 @@ const remoteClient = require('scp2');
 const AWS = require('aws-sdk');
 const fse = require('fs-extra');
 const exec = require('ssh-exec');
+const logger = require('./logger');
 
 AWS.config.loadFromPath('./aws-config.json');
 const ec2 = new AWS.EC2({apiVersion: '2016-11-15'});
@@ -39,8 +40,6 @@ export const getActiveWorkerIpList = async () => {
   return ipAddresses;
 }
 
-//exports.getActiveWorkerIpList = getActiveWorkerIpList;
-
 export const getActiveWorkerInstanceIds = async () => {
   const instanceInfo = await describeInstances();
   
@@ -56,8 +55,6 @@ export const getActiveWorkerInstanceIds = async () => {
 
   return Promise.resolve(workerIds);
 }
-
-//exports.getActiveWorkerInstanceIds = getActiveWorkerInstanceIds;
 
 const getActiveWorkerCount = async () => {
   const instanceInfo = await describeInstances();
@@ -88,7 +85,7 @@ const getOLSInstanceInfo = async () => {
       .then((instanceId) => olsStatusOk(instanceId))
       .then(() => getOLSInstanceInfo());
   } 
-  console.log('Using OLS instance: ' + olsInstance.InstanceId);
+  logger.logInfo('Using OLS instance: ' + olsInstance.InstanceId);
   return Promise.resolve(olsInstance);
 }
 
@@ -133,7 +130,7 @@ export const createNewOLS = async () => {
     });
   });
 
-  console.log('Waiting 30 seconds to retreive OLS instance data...');
+  logger.logInfo('Waiting 30 seconds to retreive OLS instance data...');
   await wait3Seconds();
   const data = await describeInstances();
 
@@ -156,8 +153,6 @@ export const createNewOLS = async () => {
   return Promise.resolve(instanceId);
 }
 
-//exports.createNewOLS = createNewOLS;
-
 const wait3Seconds = async () => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -177,7 +172,7 @@ const waitSeconds = async (seconds) => {
 export const createWorkers = async (userData) => {
   const olsInstance = await getOLSInstanceInfo();
 
-  console.log('Creating new set of workers');
+  logger.logInfo('Creating new set of workers');
  
   const securityGroupId = olsInstance.SecurityGroups[0].GroupId;
   const subNetId = olsInstance.SubnetId
@@ -203,7 +198,7 @@ export const createWorkers = async (userData) => {
         instanceId: instance.InstanceId,
         ipAddress: instance.NetworkInterfaces[0].PrivateIpAddress
       };  
-      console.log("Created instance", instanceInfo);  
+      logger.logInfo("Created instance", instanceInfo);  
       const {instanceId} = instanceInfo;      
       const tagParams = {Resources: [instanceId], Tags: [{
           Key: 'Name',
@@ -216,7 +211,7 @@ export const createWorkers = async (userData) => {
 }
 
 const olsStatusOk = async (instanceId) => {
-  console.log('Waiting for OLS to fully come online');
+  logger.logInfo('Waiting for OLS to fully come online');
   const params = {
     InstanceIds: [instanceId]
   };
@@ -225,14 +220,12 @@ const olsStatusOk = async (instanceId) => {
 
 export const workersStatusIsOk = async () => {
   const workerInstanceIds = await getActiveWorkerInstanceIds();
-  console.log('Waiting for workers to fully come online');
+  logger.logInfo('Waiting for workers to fully come online');
   const params = {
     InstanceIds: workerInstanceIds
   };
   return await ec2.waitFor('instanceStatusOk', params).promise();
 }
-
-//exports.workersStatusIsOk = workersStatusIsOk;
 
 export const getAllInstanceIds = async () => {
   const instanceInfo = await describeInstances();
@@ -247,8 +240,6 @@ export const getAllInstanceIds = async () => {
   return Promise.resolve(instanceIds);
 }
 
-//exports.getAllInstanceIds = getAllInstanceIds;
-
 export const terminateEntireFarm = async () => {
   const instanceIds = await getAllInstanceIds();
   
@@ -257,9 +248,9 @@ export const terminateEntireFarm = async () => {
       .then(data => {
         for(var i in data.TerminatingInstances) {
           var instance = data.TerminatingInstances[i];
-          console.log('TERMINATE:\t' + instance.InstanceId);                
+          logger.logInfo('TERMINATE:\t' + instance.InstanceId);                
         } 
-      }).catch(error => console.log(err));
+      }).catch(error => logger.logError(err));
     }
   );
 }

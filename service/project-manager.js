@@ -7,6 +7,7 @@ const rimraf = require('rimraf');
 const email = require('./email-manager');
 const mkdirp = require('mkdirp');
 const path = require('path');
+const logger = require('./logger');
 
 const config = require('./config');
 
@@ -33,7 +34,7 @@ const getOldestProjectFolder = async () => {
 const cancelBadlyFormedProjectFolder = async (folderPath) => {
   const userData = await getUserDataFromFolder(folderPath);
   rimraf(folderPath, (err) => {
-    if (err) console.log(err);
+    if (err) logger.logError(err);
   });
   return 'Your project folder is badly formed, It should include 1 vrscene and a cooresponding resources folder on the top level'
 }
@@ -49,7 +50,7 @@ export const getUserDataFromFolder = async (folderPath) => {
 
 export const deleteFolder = async (folderPath) => {
   rimraf(folderPath, (err) => {
-    if (err) console.log(err);
+    if (err) logger.logError(err);
   });
 }
 
