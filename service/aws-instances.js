@@ -10,7 +10,6 @@ AWS.config.loadFromPath('./aws-config.json');
 const ec2 = new AWS.EC2({apiVersion: '2016-11-15'});
 
 const config = require('./config.json');
-const olsAmiId = 'ami-a28704d8';
 
 const describeInstances = async () => {
   return ec2.describeInstances().promise(); 
@@ -78,7 +77,7 @@ const getOLSInstanceInfo = async () => {
   const instanceInfo = await describeInstances();
 
   const findOlsInstance = R.compose(
-    R.find(instance => instance.ImageId === olsAmiId && instanceIsNotShuttingDown(instance)),
+    R.find(instance => instance.ImageId === config.olsAmiId && instanceIsNotShuttingDown(instance)),
     R.chain(reservation => reservation.Instances)    
   );
 
@@ -99,12 +98,9 @@ export const workersAreActive = async () => {
 }
 
 export const createNewOLS = async () => {
-  const securityGroupId = 'sg-0f374f7d';
-  const subNetId = 'subnet-3baa4614'
-  
-  var params = {
-    ImageId: olsAmiId,
-    InstanceType: 't2.nano', //'t2.2xlarge',
+  const params = {
+    ImageId: config.olsAmiId,
+    InstanceType: config.olsInstanceType,
     MinCount: 1,
     MaxCount: 1,
     NetworkInterfaces: [{
@@ -112,8 +108,8 @@ export const createNewOLS = async () => {
         DeleteOnTermination: true,
         Description: 'Primary network interface',
         DeviceIndex: 0,
-        SubnetId: subNetId,
-        Groups: [securityGroupId]          
+        SubnetId: config.olsSubNetId,
+        Groups: [config.olsSecurityGroupId]          
     }],
   };
 
@@ -147,12 +143,12 @@ export const createNewOLS = async () => {
     reservation.Instances.forEach(instance => {
       if (instance.PrivateIpAddress === privateIpAddress) {
         instanceId = instance.InstanceId;
-        console.log('');
-        console.log("Created OLS at ", instance.PublicIpAddress);  
-        console.log(`After about 5 mins frontend will be available at http://${instance.PublicIpAddress}:8080`);
-        console.log(`You may also remote desktop at ${instance.PublicIpAddress}`);
-        console.log(`    username: Administrator`);
-        console.log(`    password: cL3$D?zyeLMTF99AAvS*Q3VI;x!A.;(G`);
+       // console.log('');
+       // console.log("Created OLS at ", instance.PublicIpAddress);  
+       // console.log(`After about 5 mins frontend will be available at http://${instance.PublicIpAddress}:8080`);
+       // console.log(`You may also remote desktop at ${instance.PublicIpAddress}`);
+       // console.log(`    username: Administrator`);
+       // console.log(`    password: cL3$D?zyeLMTF99AAvS*Q3VI;x!A.;(G`);
       }
     });
   });
@@ -187,7 +183,7 @@ export const createWorkers = async (userData) => {
   const subNetId = olsInstance.SubnetId
 
   const params = {
-    ImageId: 'ami-7b1cad01',
+    ImageId: config.renderNodeAmiId,
     InstanceType: userData.type,
     MinCount: 1,
     MaxCount: userData.count,
