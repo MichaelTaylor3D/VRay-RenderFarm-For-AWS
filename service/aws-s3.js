@@ -19,13 +19,15 @@ exports.uploadFile = async (filepath, {username}) => {
     fileStream.on('error', (err) => reject(error))
     uploadParams.Body = fileStream;
     uploadParams.Key = `${username}/${path.basename(filepath)}`;
-    s3.upload(uploadParams).promise().then((error, data) => {
-      if (error) reject(error);
+    try {
+      const data = await s3.upload(uploadParams).promise();
       if (data) {
         const location = _.cloneDeep(data.Location)
         console.log("Upload Success", location);
         resolve(location);
       }
-    });
+    } catch (error) {
+      reject(error);
+    }
   });
 }

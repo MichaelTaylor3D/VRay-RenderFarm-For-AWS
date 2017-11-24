@@ -5,6 +5,7 @@ const moment = require('moment');
 const zipFolder = require('zip-folder');
 const rimraf = require('rimraf');
 const email = require('./email-manager');
+const mkdirp = require('mkdirp');
 
 const config = require('./config');
 
@@ -63,6 +64,22 @@ const isValidVrSceneFolder = async (folderPath) => {
 
 export const getPathToNextProject = async () => {
   return await getOldestProjectFolder();
+}
+
+export const createUserOutputFolderIfDoesntExist = async (username) => {
+  return new Promise((resolve, reject) => {
+    mkdirp(config.outputFolder + username, () => {
+      resolve(config.outputFolder + username);
+    });
+  });  
+}
+
+export const createProjectOutputFolderIfDoesntExist = async (userFolder, folderName) => {
+  return new Promise((resolve, reject) => {
+    mkdirp(userFolder + folderName, () => {
+      resolve(userFolder + folderName);
+    });
+  });  
 }
 
 export const zipUpFolder = async (folderPath) => {
