@@ -3,6 +3,8 @@ const fs = require('fs-extra');
 const folderWatcher = require('./folder-watcher');
 const moment = require('moment');
 const zipFolder = require('zip-folder');
+const rimraf = require('rimraf');
+const email = require('./email-manager');
 
 const config = require('./config');
 
@@ -11,14 +13,14 @@ const getOldestProjectFolder = async () => {
   
   if (folders.length === 0) return Promise.resolve('');
 
-  // have to use for so we can await
+  // have to use for loop so we can await
   const folderInfo = [];
   for(let folder of folders) {
     if (await isValidVrSceneFolder(folder)) {
       folderInfo.push({path: folder, time: await fs.stat(folder).then(stat => stat.ctime)});
     } else {
-      await cancelBadlyFormedProjectFolder(folder);
-      return Promise.reject('No valid vrscene file detected in project');
+      const msg = await cancelBadlyFormedProjectFolder(folder);
+      return Promise.reject(msg);
     }    
   };
 
@@ -27,12 +29,14 @@ const getOldestProjectFolder = async () => {
 }
 
 const cancelBadlyFormedProjectFolder = async (folderPath) => {
-  // get userdata
-  // delete folder
-  // email that project was canceled
+  const userData = await getUserDataFromFolder(folderPath);
+  rimraf(folderPath, (err) => {
+    if (err) console.log(err);
+  });
+  return 'Your project folder is badly formed, It should include 1 vrscene and a cooresponding resources folder on the top level'
 }
 
-exports.getUserDataFromFolder = async (folderPath) => {
+export const getUserDataFromFolder = async (folderPath) => {
   return new Promise((resolve, reject) => {
     fs.readFile(folderPath + '/userData.json', (error, data) => {
       if (error) reject('User Data not found for this project');
@@ -41,7 +45,7 @@ exports.getUserDataFromFolder = async (folderPath) => {
   });
 }
 
-exports.getVrSceneFilePath = async (folderPath) => {
+export const getVrSceneFilePath = async (folderPath) => {
 
 }
 
@@ -49,11 +53,11 @@ const isValidVrSceneFolder = async (folderPath) => {
   return Promise.resolve(true);
 }
 
-exports.getPathToNextProject = async () => {
+export const getPathToNextProject = async () => {
   return await getOldestProjectFolder();
 }
 
-exports.zipFolder = async (folderPath) => {
+export const zipFolder = async (folderPath) => {
   return new Promise((resolve, reject) => {
     zipFolder(
       Path.resolve(folderPath),

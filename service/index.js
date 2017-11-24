@@ -10,6 +10,9 @@ const projectManager = require('./project-manager');
 const email = require('./email-manager');
 const vray = require('./vray-manager');
 
+const LocalStorage = require('node-localstorage').LocalStorage;
+const localStorage = new LocalStorage('./scratch');
+
 const start = async () => {
   console.log('restarting farm');
   try {
@@ -19,7 +22,10 @@ const start = async () => {
     const project = await projectManager.getPathToNextProject()
     if (!_.isEmpty(project)) {
       console.log('Found New Project to Render');
+
       const userData = await projectManager.getUserDataFromFolder(project);
+      localStorage.setItem('currentUserEmail', userData.email);
+      
       const workersAreActive = await ec2.workersAreActive();
       if (!workersAreActive) {
         await ec2.createWorkers(userData);      
@@ -40,7 +46,12 @@ const start = async () => {
 
 const handleError = (error) => {
   console.log('!: ' + error);
-  //email.error(recipiant, error);
+
+  const recipient = localStorage.getItem('currentUserEmail');
+  if (recipient) {
+    email.error(recipient, error);
+  }
+  
   //start();
 }
 
