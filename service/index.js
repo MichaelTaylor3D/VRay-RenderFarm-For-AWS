@@ -41,7 +41,7 @@ const start = async () => {
   } catch(error) {
     handleError(error);
   }
- // return await start();
+ // start();
 }
 
 const handleError = (error) => {

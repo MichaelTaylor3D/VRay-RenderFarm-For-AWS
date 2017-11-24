@@ -78,7 +78,7 @@ export const createUserOutputFolderIfDoesntExist = async (username) => {
 export const createProjectOutputFolderIfDoesntExist = async (userFolder, folderName) => {
   return new Promise((resolve, reject) => {
     mkdirp(userFolder + folderName, () => {
-      resolve(userFolder + folderName + '/');
+      resolve(userFolder + folderName);
     });
   });  
 }
