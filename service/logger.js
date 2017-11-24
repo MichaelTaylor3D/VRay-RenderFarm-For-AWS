@@ -1,12 +1,14 @@
 const winston = require('winston');
 
-export default winston.createLogger({
+const logger = winston.createLogger({
   transports: [
     new winston.transports.Console(),
     new winston.transports.File({ filename: 'log/error.log', level: 'error' }),
     new winston.transports.File({ filename: 'log/combined.log' })
   ]
 });
+
+export default logger;
 
 export const logInfo = (message) => {
   logger.log({
