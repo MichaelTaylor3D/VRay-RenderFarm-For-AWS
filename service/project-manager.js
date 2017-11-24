@@ -6,6 +6,7 @@ const zipFolder = require('zip-folder');
 const rimraf = require('rimraf');
 const email = require('./email-manager');
 const mkdirp = require('mkdirp');
+const path = require('path');
 
 const config = require('./config');
 
@@ -85,8 +86,8 @@ export const createProjectOutputFolderIfDoesntExist = async (userFolder, folderN
 export const zipUpFolder = async (folderPath) => {
   return new Promise((resolve, reject) => {
     zipFolder(
-      Path.resolve(folderPath),
-      Path.resolve(folderPath + '.zip'), function(err) {
+      path.resolve(folderPath),
+      path.resolve(folderPath + '.zip'), function(err) {
         if(err) {
           reject(err);
         } else {
