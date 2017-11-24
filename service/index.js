@@ -20,6 +20,7 @@ const start = async () => {
     await vray.loginToOLS();
     await folderWatcher.watchFolderForNewProjects();
     const project = await projectManager.getPathToNextProject()
+
     if (!_.isEmpty(project)) {
       console.log('Found New Project to Render');
 
@@ -52,7 +53,7 @@ const handleError = (error) => {
     email.error(recipient, error);
   }
   
-  //start();
+  start();
 }
 
 start();

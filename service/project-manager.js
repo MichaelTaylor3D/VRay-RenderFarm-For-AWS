@@ -50,14 +50,17 @@ export const getVrSceneFilePath = async (folderPath) => {
 }
 
 const isValidVrSceneFolder = async (folderPath) => {
-  return Promise.resolve(true);
+  const folderContents = await fs.readdir(folderPath);
+  console.log(folderContents);
+  const vrscene = folderContents.find(item => item.includes('.vrscene'));
+  return Promise.resolve(vrscene);
 }
 
 export const getPathToNextProject = async () => {
   return await getOldestProjectFolder();
 }
 
-export const zipFolder = async (folderPath) => {
+export const zipUpFolder = async (folderPath) => {
   return new Promise((resolve, reject) => {
     zipFolder(
       Path.resolve(folderPath),
