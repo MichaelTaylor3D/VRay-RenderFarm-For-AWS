@@ -263,16 +263,16 @@ export const terminateAllWorkers = async () => {
       .then(data => {
         for(var i in data.TerminatingInstances) {
           var instance = data.TerminatingInstances[i];
-          console.log('TERMINATE:\t' + instance.InstanceId);                
+          logger.logInfo('TERMINATE:\t' + instance.InstanceId);                
         } 
-      }).catch(error => console.log(err));
+      }).catch(error => logger.logError(err));
     }
   );
 }
 
 export const configureRemoteWorkers = async (userInfo, filePath) => {
   const workerIpAddresses = await getActiveWorkerIpList();
-  console.log('Sending VRLClient to ' + workerIpAddresses);
+  logger.logInfo('Sending VRLClient to ' + workerIpAddresses);
   return new Promise((resolve, reject) => {
     workerIpAddresses.forEach((ipAddress, index) => {
       remoteClient.scp(config.vrlclient, {
