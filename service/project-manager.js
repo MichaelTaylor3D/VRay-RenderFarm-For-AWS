@@ -78,7 +78,7 @@ export const createUserOutputFolderIfDoesntExist = async (username) => {
 export const createProjectOutputFolderIfDoesntExist = async (userFolder, folderName) => {
   return new Promise((resolve, reject) => {
     mkdirp(userFolder + folderName, () => {
-      resolve(userFolder + folderName);
+      resolve(userFolder + folderName + '/');
     });
   });  
 }
@@ -87,7 +87,7 @@ export const zipUpFolder = async (folderPath) => {
   return new Promise((resolve, reject) => {
     zipFolder(
       path.resolve(folderPath),
-      path.resolve(folderPath + '.zip'), function(err) {
+      path.resolve(folderPath + '.zip'), (err) => {
         if(err) {
           reject(err);
         } else {
