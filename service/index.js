@@ -37,7 +37,8 @@ const start = async () => {
       const bundledProject = await projectManager.zipUpFolder(projectOutputFolder);
       const fileDownload = await s3.uploadFile(bundledProject, userData);
       email.file(fileDownload, userData.email);
-      projectManager.deleteProjectFolder(project);
+      projectManager.deleteFolder(project);
+      projectManager.deleteFolder(bundledProject);
     }
   } catch(error) {
     handleError(error);

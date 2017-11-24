@@ -47,7 +47,7 @@ export const getUserDataFromFolder = async (folderPath) => {
   });
 }
 
-export const deleteProjectFoleder = async (folderPath) => {
+export const deleteFolder = async (folderPath) => {
   rimraf(folderPath, (err) => {
     if (err) console.log(err);
   });
