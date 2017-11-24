@@ -68,6 +68,14 @@ export const getPathToNextProject = async () => {
   return await getOldestProjectFolder();
 }
 
+export const createProjectFolderIfDoesntExist = async (folderName) => {
+  return new Promise((resolve, reject) => {
+    mkdirp(config.projectFolder + folderName, () => {
+      resolve(config.outputFolder + folderName);
+    });
+  });  
+}
+
 export const createUserOutputFolderIfDoesntExist = async (username) => {
   return new Promise((resolve, reject) => {
     mkdirp(config.outputFolder + username, () => {
