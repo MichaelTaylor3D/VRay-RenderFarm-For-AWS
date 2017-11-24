@@ -124,12 +124,12 @@ export const createNewOLS = async () => {
       privateIpAddress = instanceInfo.ipAddress;
 
       const {instanceId} = instanceInfo;      
-      params = {Resources: [instanceId], Tags: [{
+      const tagParams = {Resources: [instanceId], Tags: [{
           Key: 'Name',
           Value: 'VRay License Server (Remote Started)'
         }]
       };  
-      return ec2.createTags(params).promise();
+      return ec2.createTags(tagParams).promise();
     });
   });
 
