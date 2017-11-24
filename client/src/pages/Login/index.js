@@ -18,7 +18,7 @@ export default class Login extends ObserverComponent {
     // redirect to home if we already have an app token
     ObserverComponent.autorun(() => {
       if (this.appToken !== undefined) {
-        this.props.history.push('/home');
+        this.props.history.push('/');
       }
     });
   }

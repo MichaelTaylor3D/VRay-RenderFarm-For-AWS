@@ -5,7 +5,7 @@ require('babel-register')({
 const express = require('express');
 const app = express();
 const fileUpload = require('express-fileupload');
-const fs = require('fse');
+const fs = require('fs-extra');
 const uuid = require('node-uuid');
 const unzip = require('unzip');
 const path = require('path');

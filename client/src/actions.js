@@ -12,7 +12,8 @@ class AppActions {
       ...asyncActions('registerUser'),
       ...asyncActions('resetPassword'),
       ...asyncActions('confirmEmail'),
-      ...asyncActions('changePassword')
+      ...asyncActions('changePassword'),
+      ...asyncActions('submitJob')
     )
   }
 }

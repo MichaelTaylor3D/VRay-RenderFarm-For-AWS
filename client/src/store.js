@@ -17,7 +17,7 @@ class AppStore {
       globalMsgAction: null,
       token: mobx.observable(''),
       email: mobx.observable(''),
-      displayName: mobx.observable('')
+      username: mobx.observable('')
     });
 
     this.bindActions(AppActions);
@@ -25,7 +25,10 @@ class AppStore {
 
     // track the token in localStorage
     mobx.autorun(() => {
-      this.state.token = mobx.observable(localStorage.getItem('token'));
+      mobx.transaction(() => {
+        this.state.token = mobx.observable(localStorage.getItem('token'));
+        this.state.username = mobx.observable(localStorage.getItem('username'));
+      });
     });
   }
 
@@ -47,7 +50,7 @@ class AppStore {
 
     if (token) {
       localStorage.setItem('token', token);
-      this.state.displayName.set(user_display_name)
+      localStorage.setItem('username', user_display_name);
     }  
 
     if (message) {
@@ -56,7 +59,7 @@ class AppStore {
   }
 
   onLogoutUser() {
-    localStorage.removeItem('token');
+    localStorage.clear();
   }
 
   onSetGlobalMsg(messageInfo) {    
@@ -68,6 +71,18 @@ class AppStore {
 
     const message = messageInfo['message'] || messageInfo; 
     this.state.globalMsg.set(message);
+  }
+
+  onSubmitJob(formData) {
+    const userData = Object.assign({}, formData, {
+      token: this.state.token.get(), 
+      username: this.state.username.get()
+    });
+    console.log(userData);
+  }
+
+  onSubmitJobSuccess() {
+
   }
 
   static shouldShowGlobalProgress() {

@@ -9,7 +9,7 @@ const mkdirp = require('mkdirp');
 const path = require('path');
 const logger = require('./logger');
 
-const config = require('./config');
+const config = require('../service/config');
 
 const getOldestProjectFolder = async () => {
   const folders = await folderWatcher.getFoldersFromSource(config.projectFolder);

@@ -7,10 +7,10 @@ const fse = require('fs-extra');
 const exec = require('ssh-exec');
 const logger = require('./logger');
 
-AWS.config.loadFromPath('./aws-config.json');
+AWS.config.loadFromPath('../service/aws-config.json');
 const ec2 = new AWS.EC2({apiVersion: '2016-11-15'});
 
-const config = require('./config.json');
+const config = require('../service/config.json');
 
 const describeInstances = async () => {
   return ec2.describeInstances().promise(); 
