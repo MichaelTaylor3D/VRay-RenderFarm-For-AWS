@@ -14,20 +14,18 @@ const config = require('./config.json');
 const uploadParams = {Bucket: config.s3Bucket, Key: '', Body: ''};
 
 exports.uploadFile = async (filepath, {username}) => {
-  return new Promise((resolve, reject) => {
-    const fileStream = fs.createReadStream(filepath);
-    fileStream.on('error', (err) => reject(error))
-    uploadParams.Body = fileStream;
-    uploadParams.Key = `${username}/${path.basename(filepath)}`;
-    try {
-      const data = await s3.upload(uploadParams).promise();
-      if (data) {
-        const location = _.cloneDeep(data.Location)
-        console.log("Upload Success", location);
-        resolve(location);
-      }
-    } catch (error) {
-      reject(error);
+  const fileStream = fs.createReadStream(filepath);
+  fileStream.on('error', (err) => reject(error))
+  uploadParams.Body = fileStream;
+  uploadParams.Key = `${username}/${path.basename(filepath)}`;
+  try {
+    const data = await s3.upload(uploadParams).promise();
+    if (data) {
+      const location = _.cloneDeep(data.Location)
+      console.log("Upload Success", location);
+      return Promise.resolve(location);
     }
-  });
+  } catch (error) {
+    return Promise.reject(error);
+  }
 }
