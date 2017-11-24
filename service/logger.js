@@ -1,3 +1,5 @@
+const winston = require('winston');
+
 export default winston.createLogger({
   format: winston.format.json(),
   transports: [
