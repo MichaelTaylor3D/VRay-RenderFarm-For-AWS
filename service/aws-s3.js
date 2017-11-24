@@ -8,7 +8,7 @@ var AWS = require('aws-sdk');
 AWS.config.loadFromPath('./aws-config.json');
 
 // Create S3 service object
-s3 = new AWS.S3({apiVersion: '2006-03-01'});
+const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 const config = require('./config.json');
 
 const uploadParams = {Bucket: config.s3Bucket, Key: '', Body: ''};

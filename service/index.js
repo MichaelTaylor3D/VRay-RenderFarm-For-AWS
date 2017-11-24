@@ -1,3 +1,7 @@
+require('babel-register')({
+  presets: ['es2015', 'react']
+});
+
 const _ = require('lodash');
 const ec2 = require('./aws-instances');
 const s3 = require('./aws-s3');

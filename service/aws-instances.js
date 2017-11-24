@@ -26,7 +26,7 @@ const isInstanceARenderNode = (instance) => {
   && R.contains({Key: 'Name', Value: 'VRay Render Node'}, instance.Tags);
 }
 
-const getActiveWorkerIpList = async () => {
+export const getActiveWorkerIpList = async () => {
   const instanceInfo = await describeInstances();
 
   const getPrivateIpAddresses = R.compose(
@@ -40,9 +40,9 @@ const getActiveWorkerIpList = async () => {
   return ipAddresses;
 }
 
-exports.getActiveWorkerIpList = getActiveWorkerIpList;
+//exports.getActiveWorkerIpList = getActiveWorkerIpList;
 
-const getActiveWorkerInstanceIds = async () => {
+export const getActiveWorkerInstanceIds = async () => {
   const instanceInfo = await describeInstances();
   
   const getWorkerIds = R.compose(
@@ -58,7 +58,7 @@ const getActiveWorkerInstanceIds = async () => {
   return Promise.resolve(workerIds);
 }
 
-exports.getActiveWorkerInstanceIds = getActiveWorkerInstanceIds;
+//exports.getActiveWorkerInstanceIds = getActiveWorkerInstanceIds;
 
 const getActiveWorkerCount = async () => {
   const instanceInfo = await describeInstances();
@@ -93,18 +93,18 @@ const getOLSInstanceInfo = async () => {
   return Promise.resolve(olsInstance);
 }
 
-exports.workersAreActive = async () => {
+export const workersAreActive = async () => {
   const workerCount = await getActiveWorkerCount();
   return workerCount != 0;
 }
 
-const createNewOLS = async () => {
+export const createNewOLS = async () => {
   const securityGroupId = 'sg-0f374f7d';
   const subNetId = 'subnet-3baa4614'
   
   var params = {
     ImageId: olsAmiId,
-    InstanceType: 't2.2xlarge',
+    InstanceType: 't2.nano', //'t2.2xlarge',
     MinCount: 1,
     MaxCount: 1,
     NetworkInterfaces: [{
@@ -160,7 +160,7 @@ const createNewOLS = async () => {
   return Promise.resolve(instanceId);
 }
 
-exports.createNewOLS = createNewOLS;
+//exports.createNewOLS = createNewOLS;
 
 const wait3Seconds = async () => {
   return new Promise((resolve, reject) => {
@@ -178,7 +178,7 @@ const waitSeconds = async (seconds) => {
   });
 }
 
-exports.createWorkers = async (userData) => {
+export const createWorkers = async (userData) => {
   const olsInstance = await getOLSInstanceInfo();
 
   console.log('Creating new set of workers');
@@ -227,7 +227,7 @@ const olsStatusOk = async (instanceId) => {
   return await ec2.waitFor('instanceStatusOk', params).promise();
 }
 
-const workersStatusIsOk = async () => {
+export const workersStatusIsOk = async () => {
   const workerInstanceIds = await getActiveWorkerInstanceIds();
   console.log('Waiting for workers to fully come online');
   const params = {
@@ -236,9 +236,9 @@ const workersStatusIsOk = async () => {
   return await ec2.waitFor('instanceStatusOk', params).promise();
 }
 
-exports.workersStatusIsOk = workersStatusIsOk;
+//exports.workersStatusIsOk = workersStatusIsOk;
 
-const getAllInstanceIds = async () => {
+export const getAllInstanceIds = async () => {
   const instanceInfo = await describeInstances();
 
   const getInstanceIds = R.compose(
@@ -251,9 +251,9 @@ const getAllInstanceIds = async () => {
   return Promise.resolve(instanceIds);
 }
 
-exports.getAllInstanceIds = getAllInstanceIds;
+//exports.getAllInstanceIds = getAllInstanceIds;
 
-exports.terminateEntireFarm = async () => {
+export const terminateEntireFarm = async () => {
   const instanceIds = await getAllInstanceIds();
   
   instanceIds.forEach(instance => {
@@ -268,7 +268,7 @@ exports.terminateEntireFarm = async () => {
   );
 }
 
-exports.terminateAllWorkers = async () => {
+export const terminateAllWorkers = async () => {
   const workerInstanceIds = await getActiveWorkerInstanceIds();
   
   workerInstanceIds.forEach(worker => {
@@ -283,7 +283,7 @@ exports.terminateAllWorkers = async () => {
   );
 }
 
-exports.configureRemoteWorkers = async (userInfo, filePath) => {
+export const configureRemoteWorkers = async (userInfo, filePath) => {
   const workerIpAddresses = await getActiveWorkerIpList();
   console.log('Sending VRLClient to ' + workerIpAddresses);
   return new Promise((resolve, reject) => {
