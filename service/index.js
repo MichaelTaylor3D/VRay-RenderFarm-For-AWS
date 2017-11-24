@@ -37,11 +37,13 @@ const start = async () => {
       const bundledProject = await projectManager.zipUpFolder(projectOutputFolder);
       const fileDownload = await s3.uploadFile(bundledProject, userData);
       email.file(fileDownload, userData.email);
+      projectManager.deleteProjectFolder(project);
     }
   } catch(error) {
     handleError(error);
   }
- // start();
+  
+  start();
 }
 
 const handleError = (error) => {
@@ -55,7 +57,7 @@ const handleError = (error) => {
 
   localStorage.clear();
   
- /// start();
+   start();
 }
 
 start();
