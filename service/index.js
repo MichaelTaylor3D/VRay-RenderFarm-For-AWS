@@ -33,6 +33,7 @@ const start = async () => {
       }
       await ec2.workersStatusIsOk();
       await ec2.configureRemoteWorkers();
+      console.log(project);
       const renderedImagePath = await vray.startRender(userData, project);
       const fileDownload = await s3.uploadFile(renderedImagePath, userData);
       email.file(fileDownload, userData.email);

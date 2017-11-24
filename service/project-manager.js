@@ -52,7 +52,7 @@ export const deleteProjectFoleder = async (folderPath) => {
 }
 
 export const getVrSceneFilePath = async (folderPath) => {
-
+  return await isValidVrSceneFolder(folderPath);
 }
 
 const isValidVrSceneFolder = async (folderPath) => {
