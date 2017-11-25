@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import ModalLayout from '../../lib/components/ModalLayout';
 import { Link } from 'react-router-dom'
@@ -8,10 +9,31 @@ import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
+import FileUpload from '../../lib/components/FileUpload'
 
 import logo from '../../logo.png';
 
 export default class HomeView extends Component {
+  constructor() {
+    super();
+    this.state = {
+      progress: 0,
+      showUpload: false,
+      abort: _.noop
+    }
+  }
+
+  handleFileChange(event, value) {
+    this.props.onInputChange('files', this.fileInput.files);
+  }
+
+  onFileUploadProgress(request) {
+   this.setState({
+     progress: request.progress,
+     abort: request.req.abort
+    });
+  }
+
   render() {
     return (
       <ModalLayout link="/" label="">        
@@ -56,14 +78,17 @@ export default class HomeView extends Component {
               <input 
                 ref={node => this.fileInput = node}
                 type="file" 
-                onChange={this.props.onFileChange.bind(this)} 
+                onChange={this.handleFileChange.bind(this)} 
               />
             </center>
           </Paper>
         </div>    
         <ValidatorForm
           ref="form"
-          onSubmit={this.props.onSubmitJob}
+          onSubmit={() => {
+            this.setState({showUpload: true});
+            this.props.onSubmitJob(this.onFileUploadProgress.bind(this));
+          }}
         >
           <div className="input-container">
             <TextValidator
@@ -82,7 +107,15 @@ export default class HomeView extends Component {
               type="submit"
             />
           </div>       
-        </ValidatorForm> 
+        </ValidatorForm>
+        {
+          this.state.showUpload && 
+          <FileUpload 
+            progress={this.state.progress} 
+            onDone={() => this.setState({showUpload: false})}
+            onAbort={this.state.abort}
+          />
+        }
       </ModalLayout>
     )
   }

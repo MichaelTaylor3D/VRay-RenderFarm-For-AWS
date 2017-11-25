@@ -71,7 +71,7 @@ export const getPathToNextProject = async () => {
 export const createProjectFolderIfDoesntExist = async (folderName) => {
   return new Promise((resolve, reject) => {
     mkdirp(config.projectFolder + folderName, () => {
-      resolve(config.outputFolder + folderName);
+      resolve(path.resolve(config.projectFolder + folderName));
     });
   });  
 }

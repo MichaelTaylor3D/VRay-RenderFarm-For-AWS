@@ -1,5 +1,7 @@
 node_modules
 uploads/*
-!uploads/render-test
 output/*
 service/log/*
+server/tmp/*
+client/build
+client/node_modules

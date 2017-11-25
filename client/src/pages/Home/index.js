@@ -25,12 +25,8 @@ export default class Login extends ObserverComponent {
     this.setState({[input]: value});
   }
 
-  handleFileChange(event, value) {
-    this.setState({files: this.fileInput.files})
-  }
-
-  handleSubmitRenderJob() {
-    AppActions.submitJob({...this.state});
+  handleSubmitRenderJob(callback) {
+    AppActions.submitJob(Object.assign({}, {...this.state}, {callback}));
   }
 
   render() {
@@ -38,7 +34,6 @@ export default class Login extends ObserverComponent {
       <div>
         <HomeView 
           onInputChange={this.handleInputChange.bind(this)}
-          onFileChange={this.handleFileChange.bind(this)}
           onSubmitJob={this.handleSubmitRenderJob.bind(this)}
           {...this.state} 
         />

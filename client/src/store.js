@@ -78,7 +78,7 @@ class AppStore {
       token: this.state.token.get(), 
       username: this.state.username.get()
     });
-    console.log(userData);
+    this.getInstance().submitJob(userData);
   }
 
   onSubmitJobSuccess() {

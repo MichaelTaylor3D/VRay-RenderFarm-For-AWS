@@ -51,7 +51,8 @@ app.post('/api/downloadLink', async (req, res) => {
 app.post('/api/upload', async (req, res) => {
   try {
     await validateToken(req.body.token);
-    let sceneFile = req.files['uploads[]'];
+    console.log('token validated');
+    let sceneFile = req.files[0];
     const filePath = `./tmp/${sceneFile.name}`;
     sceneFile.mv(filePath, (err) => {
       if (err) {
@@ -92,17 +93,18 @@ const parseUserData = (req) => {
 const createProject = async (filePath, userData) => {
   const projectName = uuid.v4();
   const projectFolder = await projectManager.createProjectFolderIfDoesntExist(projectName);
-  
-  const readStream = fs.createReadStream(filePath);
-  const writeStream = fstream.Writer(projectFolder);
+  console.log(projectFolder);
 
-  fs.createReadStream(filePath)
+  var readStream = fs.createReadStream(filePath);
+  var writeStream = fstream.Writer(projectFolder);
+   
+  readStream
     .pipe(unzip.Parse())
-    .pipe(writeStream);
-
-  writeStream.on('close', () => {
+    .pipe(writeStream)
+  
+    writeStream.on('close', () => {
     const serializedUserData = JSON.stringify(userData);
-    fs.writeFile(projectFolder + 'userData.json', serializedUserData);
+    fs.writeFile(projectFolder + '/userData.json', serializedUserData);
   });
 }
 
