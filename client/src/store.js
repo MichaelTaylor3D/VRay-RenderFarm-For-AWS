@@ -90,13 +90,14 @@ class AppStore {
   }
 
   onSubmitJobSuccess(res) {
+    if (res.text.includes('Invalid Token')) {
+      localStorage.clear();
+    }
+    
     AppActions.setGlobalMsg.defer(res.text);
   }
 
   onSubmitAndDownloadJob(userData) {
-    if (res.text.includes('Invalid Token')) {
-      localStorage.clear();
-    }
     this.getInstance().submitAndDownloadJob(userData);
   }
 
