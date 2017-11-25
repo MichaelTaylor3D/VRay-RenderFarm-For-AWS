@@ -25,14 +25,15 @@ class FileUpload extends Component {
     let actions;
 
     actions = [
-      <FlatButton
+     /* <FlatButton
         label="Abort"
         primary={true}
         onClick={() => {
+          console.log(this.props.onAbort)
           this.props.onAbort();
-          this.props.onDone();
+          //this.props.onDone();
         }}
-      />
+      />*/
     ]
     
     if (this.props.progress === 100) {

@@ -86,7 +86,9 @@ export default class HomeView extends Component {
         <ValidatorForm
           ref="form"
           onSubmit={() => {
-            this.setState({showUpload: true});
+            if (!this.props.download) {
+              this.setState({showUpload: true});
+            }            
             this.props.onSubmitJob(this.onFileUploadProgress.bind(this));
           }}
         >

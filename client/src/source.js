@@ -34,6 +34,18 @@ const AppDataSource = {
     });
 
     return yield req;
+  })),
+
+  ...sourceMethod('submitAndDownloadJob', AppActions, co.wrap(function* (state, userData) {
+    const formData = new FormData();
+    formData.append('username', userData.username);
+    formData.append('email', userData.email);
+    formData.append('type', userData.type);
+    formData.append('count', userData.count);
+    formData.append('token', userData.token);
+    formData.append('download', userData.download);
+
+    return yield request.post('api/submitAndDownload').send(formData);
   }))
 };
 

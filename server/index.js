@@ -7,12 +7,13 @@ const app = express();
 const fileUpload = require('express-fileupload');
 const fs = require('fs-extra');
 const uuid = require('node-uuid');
-const unzip = require('unzip');
+const unzip = require('unzip2');
 const path = require('path');
 const fstream = require('fstream');
 const request = require('superagent');
 const projectManager = require('../service/project-manager');
-const server = require('http').createServer(app);  
+const spawn = require('child_process').spawn;
+const server = require('http').createServer(app);
 
 const tokenHost = 'https://oonix.io/wp-json';
 
@@ -26,22 +27,30 @@ app.get('/', (req, res) => {
 
 app.use(fileUpload());
 
-app.post('/api/downloadLink', async (req, res) => {
+app.post('/api/submitAndDownload', async (req, res) => {
   if (!req.body.download) {
     res.status(400).send('You must specify a url to download');
   }
 
   try {
     await validateToken(req.body.token);
+    res.send("Downloading project to server");
+
     const downloadName = uuid.v4();
     const downloadPath = `./tmp/${downloadName}.zip`;
-    const file = fs.createWriteStream();
-    const request = http.get(req.body.download, (response) => {
-      response.pipe(file);
-      file.on('finish', function() {
-        const userData = parseUserData(req);
-        file.close(() => createProject(downloadPath, userData)); 
-      });
+
+    const scriptArgs = [
+      '-L',
+      '-o',
+      downloadPath,
+      req.body.download
+    ]
+
+    const process = spawn('curl', scriptArgs);
+
+    process.on('exit', () => {      
+      const userData = parseUserData(req);
+      createProject(downloadPath, userData)      
     });
   } catch (error) {
     return res.status(500).send(error);
@@ -60,6 +69,7 @@ app.post('/api/upload', async (req, res) => {
       }
       const userData = parseUserData(req);
       createProject(filePath, userData);
+      res.send("File was download and submitted to render queue");
     });
   } catch (error) {
     return res.status(500).send(error);
@@ -93,18 +103,17 @@ const parseUserData = (req) => {
 const createProject = async (filePath, userData) => {
   const projectName = uuid.v4();
   const projectFolder = await projectManager.createProjectFolderIfDoesntExist(projectName);
-  console.log(projectFolder);
 
-  var readStream = fs.createReadStream(filePath);
-  var writeStream = fstream.Writer(projectFolder);
+  const readStream = fs.createReadStream(filePath);
+  const writeStream = fstream.Writer(projectFolder);
    
   readStream
     .pipe(unzip.Parse())
     .pipe(writeStream)
   
-    writeStream.on('close', () => {
+  writeStream.on('close', () => {
     const serializedUserData = JSON.stringify(userData);
     fs.writeFile(projectFolder + '/userData.json', serializedUserData);
+    projectManager.deleteFolder(filePath);
   });
 }
-

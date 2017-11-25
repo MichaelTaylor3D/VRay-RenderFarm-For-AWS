@@ -78,11 +78,24 @@ class AppStore {
       token: this.state.token.get(), 
       username: this.state.username.get()
     });
-    this.getInstance().submitJob(userData);
+
+    if (userData.download) {
+      AppActions.submitAndDownloadJob.defer(userData);
+    } else {
+      this.getInstance().submitJob(userData);
+    }    
   }
 
-  onSubmitJobSuccess() {
+  onSubmitJobSuccess(res) {
+    console.log(res);
+  }
 
+  onSubmitAndDownloadJob(userData) {
+    this.getInstance().submitAndDownloadJob(userData);
+  }
+
+  onSubmitAndDownloadJobSuccess(res) {
+    console.log(res);
   }
 
   static shouldShowGlobalProgress() {
