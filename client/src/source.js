@@ -33,7 +33,7 @@ const AppDataSource = {
       userData.callback({req, progress: event.percent});
     });
 
-    return Promise.resolve();
+    return yield req;
   }))
 };
 
