@@ -28,9 +28,8 @@ class FileUpload extends Component {
       <FlatButton
         label="Abort"
         primary={true}
-        keyboardFocused={true}
         onClick={() => {
-          this.props.abort();
+          this.props.onAbort();
           this.props.onDone();
         }}
       />
@@ -41,7 +40,6 @@ class FileUpload extends Component {
         <FlatButton
           label="Done!"
           primary={true}
-          keyboardFocused={true}
           onClick={this.props.onDone}
         />
       );      
