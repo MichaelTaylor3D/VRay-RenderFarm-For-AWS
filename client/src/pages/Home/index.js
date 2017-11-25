@@ -10,10 +10,17 @@ export default class Login extends ObserverComponent {
     super();
     this.state = {
       email: '',
-      type: '',
-      count: '',
+      type: 0,
+      count: 9,
       download: '',
       files: ''
+    }
+  }
+
+  componentDidMount() {
+    const initialEmail = AppStore.getSignedInUserEmail();
+    if (initialEmail) {
+      this.setState({email: initialEmail});
     }
   }
 

@@ -17,7 +17,8 @@ class AppStore {
       globalMsgAction: null,
       token: mobx.observable(''),
       email: mobx.observable(''),
-      username: mobx.observable('')
+      username: mobx.observable(''),
+      signedInUserEmail: mobx.observable('')
     });
 
     this.bindActions(AppActions);
@@ -28,6 +29,7 @@ class AppStore {
       mobx.transaction(() => {
         this.state.token = mobx.observable(localStorage.getItem('token'));
         this.state.username = mobx.observable(localStorage.getItem('username'));
+        this.state.signedInUserEmail = mobx.observable(localStorage.getItem('signedInUserEmail'));
       });
     });
   }
@@ -45,12 +47,13 @@ class AppStore {
     this.getInstance().loginUser({username, password});
   }
 
-  onLoginUserSuccess({token, message, user_display_name}) {
+  onLoginUserSuccess({token, message, user_display_name, user_email}) {
     AppActions.deactivateGlobalProgress.defer();
 
     if (token) {
       localStorage.setItem('token', token);
       localStorage.setItem('username', user_display_name);
+      localStorage.setItem('signedInUserEmail', user_email);
     }  
 
     if (message) {
@@ -87,15 +90,21 @@ class AppStore {
   }
 
   onSubmitJobSuccess(res) {
-    console.log(res);
+    AppActions.setGlobalMsg.defer(res.text);
   }
 
   onSubmitAndDownloadJob(userData) {
+    if (res.text.includes('Invalid Token')) {
+      localStorage.clear();
+    }
     this.getInstance().submitAndDownloadJob(userData);
   }
 
   onSubmitAndDownloadJobSuccess(res) {
-    console.log(res);
+    if (res.text.includes('Invalid Token')) {
+      localStorage.clear();
+    }
+    AppActions.setGlobalMsg.defer(res.text);
   }
 
   static shouldShowGlobalProgress() {
@@ -116,6 +125,10 @@ class AppStore {
 
   static getPagesToIgnoreOnLoginRedirect() {
     return this.getState().ignoreLoginRedirectOnPages;
+  }
+
+  static getSignedInUserEmail() {
+    return this.getState().signedInUserEmail.get();
   }
 }
 

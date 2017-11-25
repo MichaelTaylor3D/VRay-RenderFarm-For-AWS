@@ -19,8 +19,8 @@ const AppDataSource = {
     const formData = new FormData();
     formData.append('username', userData.username);
     formData.append('email', userData.email);
-    formData.append('type', userData.type);
-    formData.append('count', userData.count);
+    formData.append('type', convertTypeCode(userData.type));
+    formData.append('count', convertCountCode(userData.count));
     formData.append('token', userData.token);
 
     for (var key in userData.files) {
@@ -40,8 +40,8 @@ const AppDataSource = {
     const formData = new FormData();
     formData.append('username', userData.username);
     formData.append('email', userData.email);
-    formData.append('type', userData.type);
-    formData.append('count', userData.count);
+    formData.append('type', convertTypeCode(userData.type));
+    formData.append('count', convertCountCode(userData.count));
     formData.append('token', userData.token);
     formData.append('download', userData.download);
 
@@ -50,3 +50,20 @@ const AppDataSource = {
 };
 
 export default AppDataSource;
+
+function convertTypeCode(code) {
+  switch(Number(code)) {
+    case 0:
+      return 't2.2xlarge';
+    case 1:
+      return 'm4.4xlarge';
+    case 2:
+      return 'm4.16xlarge';
+    default:
+      return convertTypeCode(0);
+  }
+}
+
+function convertCountCode(code) {
+  return code + 1;
+}
