@@ -7,6 +7,8 @@ const logger = require('./logger');
 
 const uploadDir = config.projectFolder;
 
+let idleCount = 0;
+
 const isDirectory = (source) => {
   return fs.lstatSync(source).isDirectory();
 }
@@ -41,6 +43,12 @@ const watchFolderForNewProjects = async () => {
   logger.logInfo('Looking for new projects...');
   const foundProject = await foldersExistInSource(uploadDir);
   if(!foundProject) {
+    idleCount++;
+    
+    // if idle for 30mins
+    if (idleCount === 60) {
+      ec2.terminateEntireFarm();
+    }
 
     const workersAreActive = await ec2.workersAreActive();
     if (workersAreActive) {
@@ -50,6 +58,7 @@ const watchFolderForNewProjects = async () => {
     await wait30Seconds();
     return await watchFolderForNewProjects();
   } else {
+    idleCount = 0;
     return Promise.resolve(true);
   }
 };
