@@ -76,7 +76,7 @@ const getOLSInstanceInfo = async () => {
   const findOlsInstance = R.compose(
     R.find(instance => instance.ImageId === config.olsAmiId && instanceIsNotShuttingDown(instance)),
     R.chain(reservation => reservation.Instances)    
-  );
+  ); 
 
   const olsInstance = findOlsInstance(instanceInfo.Reservations);
 
