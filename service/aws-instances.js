@@ -275,7 +275,8 @@ export const configureRemoteWorkers = async (userInfo, filePath) => {
   logger.logInfo('Sending VRLClient to ' + workerIpAddresses);
   return new Promise((resolve, reject) => {
     workerIpAddresses.forEach((ipAddress, index) => {
-      remoteClient.scp(config.vrlclient, {
+      console.log(path.resolve(config.vrlclient));
+      remoteClient.scp(path.resolve(config.vrlclient), {
         host: ipAddress,
         username: 'ec2-user',
         privateKey: fse.readFileSync('./RenderFarm.pem'),
