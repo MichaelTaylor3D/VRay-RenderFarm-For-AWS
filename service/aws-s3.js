@@ -16,9 +16,12 @@ const uploadParams = {Bucket: config.s3Bucket, Key: '', Body: ''};
 
 exports.uploadFile = async (filepath, {username}) => {
   const fileStream = fs.createReadStream(filepath);
+
   fileStream.on('error', (err) => reject(error))
+
   uploadParams.Body = fileStream;
   uploadParams.Key = `${username}/${path.basename(filepath)}`;
+  
   try {
     const data = await s3.upload(uploadParams).promise();
     if (data) {
