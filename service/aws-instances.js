@@ -12,7 +12,7 @@ const ec2 = new AWS.EC2({apiVersion: '2016-11-15'});
 
 const config = require('../service/config.json');
 
-const describeInstances = async () => {
+export const describeInstances = async () => {
   return ec2.describeInstances().promise(); 
 }
 
@@ -70,7 +70,7 @@ const getActiveWorkerCount = async () => {
   return Promise.resolve(getWorkerCount(instanceInfo.Reservations));
 }
 
-const getOLSInstanceInfo = async () => {
+export const getOLSInstanceInfo = async () => {
   const instanceInfo = await describeInstances();
 
   const findOlsInstance = R.compose(
@@ -290,5 +290,16 @@ export const configureRemoteWorkers = async (userInfo, filePath) => {
         }
       })
     });
+  });
+}
+
+export const monitorRenderManager = async () => {
+  var params = {
+    InstanceIds: [ 'i-0dcae2ced34e92e9b' ],
+    DryRun: false
+  };
+  ec2.monitorInstances(params, function(err, data) {
+    if (err) console.log(err, err.stack); // an error occurred
+    else     console.log(data.InstanceMonitorings[0].Monitoring);           // successful response
   });
 }

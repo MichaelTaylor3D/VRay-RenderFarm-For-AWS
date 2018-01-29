@@ -2,9 +2,9 @@ require('babel-register')({
   presets: ['es2015', 'react']
 });
 
-const email = require('./email-manager');
+//const email = require('./email-manager');
 
-email.error('michael.d.taylor@gmail.com', 'test error');
+//email.error('michael.d.taylor@gmail.com', 'test error');
 
 /*
 {
@@ -19,3 +19,6 @@ email.error('michael.d.taylor@gmail.com', 'test error');
   "renderNodeAmiId": "ami-7b1cad01"
 }
 */
+
+const ec2 = require('./aws-instances');
+ec2.monitorRenderManager();
