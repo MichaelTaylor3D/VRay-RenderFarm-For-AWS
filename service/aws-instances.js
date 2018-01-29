@@ -181,7 +181,7 @@ export const createSpotWorkers = async (userData) => {
     InstanceCount: userData.count, 
     LaunchSpecification: {
      ImageId: config.renderNodeAmiId, 
-     InstanceType: 't2.2xlarge', 
+     InstanceType: 'm5.2xlarge', 
      NetworkInterfaces: [{
         AssociatePublicIpAddress: true,
         DeleteOnTermination: true,
@@ -191,7 +191,7 @@ export const createSpotWorkers = async (userData) => {
         Groups: [securityGroupId]          
       }],
     },
-    SpotPrice: '0.1114',
+    SpotPrice: '0.1613',
     Type: 'persistent'
    };
 
