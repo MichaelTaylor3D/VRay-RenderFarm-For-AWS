@@ -28,7 +28,7 @@ const wait30Secs = async () => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       resolve();
-    }, 30000);
+    }, 3000);
   });
 }
 
@@ -36,14 +36,14 @@ const monitorRenderManager = async () => {
   try {
     const { InstanceId, InstanceType} = await myEc2.getOLSInstanceInfo();
   
-    const { Average: cpuUtilization } = await getCPUUtilization(InstanceId);
+    const { Maximum: cpuUtilization } = await getCPUUtilization(InstanceId);
     console.log(cpuUtilization);
     if (cpuUtilization > 99) {
       console.log('CPU Usage really high, scaling to bigger instance')
-      await scaleSmaller(InstanceId, InstanceType);
+    //  await scaleSmaller(InstanceId, InstanceType);
     } else if (cpuUtilization < 1) {
       console.log('CPU usage really low, scaling to lower instance');
-      await scaleSmaller(InstanceId, InstanceType);
+     // await scaleSmaller(InstanceId, InstanceType);
     } else {
       console.log('CPU usage good, maintaining current instance size');
     }
@@ -63,13 +63,13 @@ const getCPUUtilization = async(instanceId) => {
     EndTime: new Date(),
     MetricName: 'CPUUtilization',
     Namespace: 'AWS/EC2', 
-    Period: 1800,
+    Period: 18000,
     StartTime: yesturday,
     Dimensions: [{
       Name: 'InstanceId', 
       Value: instanceId 
     }],
-    Statistics: ['Average']
+    Statistics: ['Maximum']
   };
 
 
@@ -78,7 +78,8 @@ const getCPUUtilization = async(instanceId) => {
       if (err) {
         reject(err, err.stack)
       } else {
-        resolve(data.Datapoints[data.Datapoints.length - 1]);
+       // console.log(data.Datapoints);
+        resolve(data.Datapoints[0]);
       }       
     });
   });

@@ -169,6 +169,49 @@ const waitSeconds = async (seconds) => {
   });
 }
 
+export const createSpotWorkers = async (userDate) => {
+  const olsInstance = await getOLSInstanceInfo();
+
+  logger.logInfo('Creating new set of workers');
+ 
+  const securityGroupId = olsInstance.SecurityGroups[0].GroupId;
+  const subNetId = olsInstance.SubnetId
+
+  var params = {
+    InstanceCount: userData.count, 
+    LaunchSpecification: {
+     ImageId: config.renderNodeAmiId, 
+     InstanceType: userData.type, 
+     NetworkInterfaces: [{
+        AssociatePublicIpAddress: true,
+        DeleteOnTermination: true,
+        Description: 'Primary network interface',
+        DeviceIndex: 0,
+        SubnetId: subNetId,
+        Groups: [securityGroupId]          
+      }],
+    }, 
+    Type: 'persistent'
+   };
+
+   return await ec2.requestSpotInstances(params).promise().then(data => {
+    data.Instances.forEach(instance => {
+      const instanceInfo = {
+        instanceId: instance.InstanceId,
+        ipAddress: instance.NetworkInterfaces[0].PrivateIpAddress
+      };  
+      logger.logInfo("Created instance", instanceInfo);  
+      const {instanceId} = instanceInfo;      
+      const tagParams = {Resources: [instanceId], Tags: [{
+          Key: 'Name',
+          Value: 'VRay Render Node'
+        }]
+      };  
+      return ec2.createTags(tagParams).promise();
+    });
+  });
+}
+
 export const createWorkers = async (userData) => {
   const olsInstance = await getOLSInstanceInfo();
 
