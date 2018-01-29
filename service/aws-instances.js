@@ -180,7 +180,7 @@ export const createSpotWorkers = async (userData) => {
   var params = {
     InstanceCount: userData.count, 
     LaunchSpecification: {
-     ImageId: config.renderNodeAmiId, 
+     ImageId: 'ami-ed3e4197', 
      InstanceType: 'm5.2xlarge', 
      NetworkInterfaces: [{
         AssociatePublicIpAddress: true,
