@@ -195,6 +195,7 @@ export const createSpotWorkers = async (userData) => {
    };
 
    return await ec2.requestSpotInstances(params).promise().then(data => {
+     console.log(data);
     data.Instances.forEach(instance => {
       const instanceInfo = {
         instanceId: instance.InstanceId,
