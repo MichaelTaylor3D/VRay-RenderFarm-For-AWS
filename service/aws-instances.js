@@ -169,7 +169,7 @@ const waitSeconds = async (seconds) => {
   });
 }
 
-export const createSpotWorkers = async (userDate) => {
+export const createSpotWorkers = async (userData) => {
   const olsInstance = await getOLSInstanceInfo();
 
   logger.logInfo('Creating new set of workers');
