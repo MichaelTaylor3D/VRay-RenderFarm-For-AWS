@@ -54,11 +54,11 @@ export default AppDataSource;
 function convertTypeCode(code) {
   switch(Number(code)) {
     case 0:
-      return 't2.2xlarge';
+      return 'c4.xlarge';
     case 1:
-      return 'm4.4xlarge';
+      return 'c4.2xlarge';
     case 2:
-      return 'm4.16xlarge';
+      return 'c4.4xlarge';
     default:
       return convertTypeCode(0);
   }
