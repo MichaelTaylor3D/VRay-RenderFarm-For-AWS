@@ -46,7 +46,7 @@ const watchFolderForNewProjects = async () => {
     idleCount++;
     
     // if idle for 30mins
-    if (idleCount === 60) {
+    if (idleCount === 240) {
       ec2.terminateEntireFarm();
     }
 
