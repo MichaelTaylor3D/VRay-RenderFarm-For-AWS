@@ -46,8 +46,8 @@ const watchFolderForNewProjects = async () => {
     idleCount++;
     
     // if idle for 30mins
-    if (idleCount === 240) {
-      ec2.terminateEntireFarm();
+    if (idleCount === 60) {
+      //ec2.terminateEntireFarm();
     }
 
     const workersAreActive = await ec2.workersAreActive();
