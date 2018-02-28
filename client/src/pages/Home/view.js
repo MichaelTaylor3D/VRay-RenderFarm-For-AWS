@@ -66,6 +66,9 @@ export default class HomeView extends Component {
             <MenuItem value={7} primaryText="8" />
             <MenuItem value={8} primaryText="9" />
             <MenuItem value={9} primaryText="10" />
+            <MenuItem value={10} primaryText="11" />
+            <MenuItem value={11} primaryText="12" />
+            <MenuItem value={12} primaryText="13" />
           </SelectField>
           <Paper style={{padding: 5, paddingTop: 0}}>
             <TextField 
