@@ -54,7 +54,7 @@ export default AppDataSource;
 function convertTypeCode(code) {
   switch(Number(code)) {
     case 0:
-      return '5.2xlarge';
+      return 'm5.2xlarge';
     case 1:
       return 'm5.12xlarge';
     case 2:
