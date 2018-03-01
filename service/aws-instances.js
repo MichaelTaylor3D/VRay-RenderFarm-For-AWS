@@ -302,7 +302,7 @@ export const terminateEntireFarm = async () => {
 
 export const terminateAllWorkers = async () => {
   const workerInstanceIds = await getActiveWorkerInstanceIds();
-  /*
+  
   workerInstanceIds.forEach(worker => {
     ec2.terminateInstances({ InstanceIds: [worker] }).promise()
       .then(data => {
@@ -312,7 +312,7 @@ export const terminateAllWorkers = async () => {
         } 
       }).catch(error => logger.logError(err));
     }
-  );*/
+  );
 }
 
 export const configureRemoteWorkers = async (userInfo, filePath) => {
