@@ -20,9 +20,11 @@ const start = async () => {
   try {
     await vray.createVrlClientFile();
 
-    //await vray.startLocalOls();
-    // needed to remove any login caching
+    await vray.startLocalOls();
+    await folderWatcher.wait30Seconds();
+    // needed to remove any login caching    
     await vray.logoutOffOLS()
+    await folderWatcher.wait30Seconds();
     await vray.loginToOLS();
 
     await folderWatcher.watchFolderForNewProjects();

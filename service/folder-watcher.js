@@ -31,7 +31,7 @@ const foldersExistInSource = async (source) => {
   return (folders.length !== 0);
 }
 
-const wait30Seconds = async () => {
+export const wait30Seconds = async () => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       resolve();
