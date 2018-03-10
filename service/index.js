@@ -19,8 +19,12 @@ const start = async () => {
   logger.logInfo('restarting farm');
   try {
     await vray.createVrlClientFile();
+
     await vray.startLocalOls();
+    // needed to remove any login caching
+    await vray.logoutOffOLS()
     await vray.loginToOLS();
+
     await folderWatcher.watchFolderForNewProjects();
     const project = await projectManager.getPathToNextProject()
 
