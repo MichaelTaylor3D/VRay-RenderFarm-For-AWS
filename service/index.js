@@ -20,7 +20,7 @@ const start = async () => {
   try {
     await vray.createVrlClientFile();
 
-    await vray.startLocalOls();
+    //await vray.startLocalOls();
     // needed to remove any login caching
     await vray.logoutOffOLS()
     await vray.loginToOLS();
