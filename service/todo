@@ -1,0 +1,7 @@
+- Decouple zip processor from upload server
+- make a processor micro service that watches a staging folder
+- files get uploaded to the staging folder
+
+- Decouple starting the OLS from the render queue
+
+- set up tmux session for render nodes
