@@ -15,8 +15,6 @@ const vray = require('../vray-manager');
 const localVrlClientFile = '/home/ec2-user/.Chaosgroup/vrlclient.xml';
 const rootVrlClientFile =  '/root/.Chaosgroup/vrlclient.xml';
 
-startOLS();
-
 /*watch('/home/ec2-user/.ChaosGroup/vrlclient.xml', { recursive: true }, function(evt, name) {
   console.log()
   setTimeout(() => {
@@ -46,5 +44,6 @@ const createVrayServer = () => {
   });
 
   return server;
-  }
+}
  
+  startOLS();
