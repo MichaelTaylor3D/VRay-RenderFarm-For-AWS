@@ -12,13 +12,15 @@ const vray = require('./vray-manager');
 
 const logger = require('./logger');
 
+const config = require('./config.json');
+
 const LocalStorage = require('node-localstorage').LocalStorage;
 const localStorage = new LocalStorage('./scratch');
 
 const start = async () => {
   logger.logInfo('restarting farm');
   try {
-    await vray.createVrlClientFile();
+    await vray.createVrlClientFile(config.vrlclient);
 
     await vray.startLocalOls();
     // needed to remove any login caching   
@@ -41,7 +43,7 @@ const start = async () => {
         await ec2.createWorkers(userData);      
       }
       await ec2.workersStatusIsOk();
-      await ec2.configureRemoteWorkers();
+      // await ec2.configureRemoteWorkers();
       const projectOutputFolder = await vray.startRender(userData, project);
       const bundledProject = await projectManager.zipUpFolder(projectOutputFolder);
       const fileDownload = await s3.uploadFile(bundledProject, userData);
