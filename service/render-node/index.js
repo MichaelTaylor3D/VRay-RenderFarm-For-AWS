@@ -9,8 +9,8 @@ var fs = require('fs-extra');
 var kill  = require('tree-kill');
 const spawn = require('child_process').spawn;
 
-const folderWatcher = require('./folder-watcher');
-const vray = require('./vray-manager');
+const folderWatcher = require('../folder-watcher');
+const vray = require('../vray-manager');
 
 const localVrlClientFile = '/home/ec2-user/.Chaosgroup/vrlclient.xml';
 const rootVrlClientFile =  '/root/.Chaosgroup/vrlclient.xml';
