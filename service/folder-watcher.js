@@ -1,6 +1,6 @@
 const { compose, filter, map } = require('ramda');
 const fs = require('fs-extra');
-const path = require('path')
+const path = require('path');
 const ec2 = require('./aws-instances');
 const config = require('./config');
 const logger = require('./logger');

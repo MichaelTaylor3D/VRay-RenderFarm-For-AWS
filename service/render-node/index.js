@@ -8,6 +8,7 @@ var watch = require('node-watch');
 var fs = require('fs-extra');
 var kill  = require('tree-kill');
 const spawn = require('child_process').spawn;
+const path = require('path');
 
 const folderWatcher = require('../folder-watcher');
 const vray = require('../vray-manager');
