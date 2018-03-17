@@ -16,17 +16,10 @@ const vray = require('../vray-manager');
 const localVrlClientFile = '/home/ec2-user/.Chaosgroup/vrlclient.xml';
 const rootVrlClientFile =  '/root/.Chaosgroup/vrlclient.xml';
 
-/*watch('/home/ec2-user/.ChaosGroup/vrlclient.xml', { recursive: true }, function(evt, name) {
-  console.log()
-  setTimeout(() => {
-      createVrayServer();
-  }, 1000);
-});*/
-
 const startOLS = async () => {
   await vray.createVrlClientFile();
-  fs.copySync(path.resolve(__dirname,'./vrlclient.xml'), localVrlClientFile);
-  fs.copySync(path.resolve(__dirname,'./vrlclient.xml'), rootVrlClientFile);
+  fs.copySync(path.resolve(__dirname,'../vrlclient.xml'), localVrlClientFile);
+  fs.copySync(path.resolve(__dirname,'../vrlclient.xml'), rootVrlClientFile);
   await vray.startLocalOls();
   // needed to remove any login caching   
   await folderWatcher.wait30Seconds(); 
