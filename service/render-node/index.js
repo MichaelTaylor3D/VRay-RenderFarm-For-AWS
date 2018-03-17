@@ -1,3 +1,7 @@
+require('babel-register')({
+  presets: ['es2015', 'react']
+});
+
 var watch = require('node-watch');
 var fs = require('fs-extra');
 var kill  = require('tree-kill');
