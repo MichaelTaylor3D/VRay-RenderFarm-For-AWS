@@ -13,8 +13,8 @@ const path = require('path');
 const folderWatcher = require('../folder-watcher');
 const vray = require('../vray-manager');
 
-const localVrlClientFile = '/home/ec2-user/.Chaosgroup/vrlclient.xml';
-const rootVrlClientFile =  '/root/.Chaosgroup/vrlclient.xml';
+const localVrlClientFile = '/home/ec2-user/.ChaosGroup/vrlclient.xml';
+const rootVrlClientFile =  '/root/.ChaosGroup/vrlclient.xml';
 
 const startOLS = async () => {
   await vray.createVrlClientFile();
