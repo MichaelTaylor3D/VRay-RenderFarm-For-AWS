@@ -6,21 +6,29 @@ const spawn = require('child_process').spawn;
 const folderWatcher = require('../folder-watcher');
 const vray = require('../vray-manager');
 
+const localVrlClientFile = '/home/ec2-user/.Chaosgroup/vrlclient.xml';
+const rootVrlClientFile =  '/root/.Chaosgroup/vrlclient.xml';
+
 startOLS();
 
-watch('/home/ec2-user/.ChaosGroup/vrlclient.xml', { recursive: true }, function(evt, name) {
+/*watch('/home/ec2-user/.ChaosGroup/vrlclient.xml', { recursive: true }, function(evt, name) {
+  console.log()
   setTimeout(() => {
       createVrayServer();
   }, 1000);
-});
+});*/
 
 const startOLS = async () => {
+  await vray.createVrlClientFile('/home/ec2-user/.Chaosgroup/vrlclient.xml');
+  fs.createReadStream(localVrlClientFile).pipe(fs.createWriteStream(rootVrlClientFile));
   await vray.startLocalOls();
   // needed to remove any login caching   
   await folderWatcher.wait30Seconds(); 
   await vray.logoutOffOLS()
   await folderWatcher.wait30Seconds();
   await vray.loginToOLS();
+
+  createVrayServer();
 }
 
 const createVrayServer = () => {
