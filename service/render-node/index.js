@@ -23,8 +23,8 @@ const rootVrlClientFile =  '/root/.Chaosgroup/vrlclient.xml';
 });*/
 
 const startOLS = async () => {
-  await vray.createVrlClientFile('/home/ec2-user/.Chaosgroup/vrlclient.xml');
-  //fs.createReadStream(localVrlClientFile).pipe(fs.createWriteStream(rootVrlClientFile));
+  await vray.createVrlClientFile(localVrlClientFile);
+  fs.createReadStream(localVrlClientFile).pipe(fs.createWriteStream(rootVrlClientFile));
   await vray.startLocalOls();
   // needed to remove any login caching   
   await folderWatcher.wait30Seconds(); 
