@@ -2,6 +2,8 @@ require('babel-register')({
   presets: ['es2015', 'react']
 });
 
+process.chdir('../');
+
 var watch = require('node-watch');
 var fs = require('fs-extra');
 var kill  = require('tree-kill');
@@ -12,8 +14,6 @@ const vray = require('./vray-manager');
 
 const localVrlClientFile = '/home/ec2-user/.Chaosgroup/vrlclient.xml';
 const rootVrlClientFile =  '/root/.Chaosgroup/vrlclient.xml';
-
-process.chdir('../');
 
 startOLS();
 
