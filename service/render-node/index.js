@@ -18,7 +18,7 @@ const rootVrlClientFile =  '/root/.ChaosGroup/vrlclient.xml';
 
 const startOLS = async () => {
   await vray.createVrlClientFile();
-  console.log('copying vrlclient to' + path.resolve(__dirname,'../vrlclient.xml'));
+  console.log('copying vrlclient from ' + path.resolve(__dirname,'../vrlclient.xml') + ' to ' + localVrlClientFile);
   fs.copySync(path.resolve(__dirname,'../vrlclient.xml'), localVrlClientFile);
   fs.copySync(path.resolve(__dirname,'../vrlclient.xml'), rootVrlClientFile);
   await vray.startLocalOls();
