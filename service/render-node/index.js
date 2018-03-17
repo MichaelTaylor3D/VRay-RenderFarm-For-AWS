@@ -6,7 +6,6 @@ process.chdir('../');
 
 var watch = require('node-watch');
 var fs = require('fs-extra');
-var fsold = require('fs');
 var kill  = require('tree-kill');
 const spawn = require('child_process').spawn;
 const path = require('path');
@@ -20,8 +19,8 @@ const rootVrlClientFile =  '/root/.ChaosGroup/vrlclient.xml';
 const startOLS = async () => {
   await vray.createVrlClientFile();
   console.log('copying vrlclient from ' + path.resolve(__dirname,'../vrlclient.xml') + ' to ' + localVrlClientFile);
-  fsold.copySync(path.resolve(__dirname,'../vrlclient.xml'), localVrlClientFile);
-  fsold.copySync(path.resolve(__dirname,'../vrlclient.xml'), rootVrlClientFile);
+  await fs.copy(path.resolve(__dirname,'../vrlclient.xml'), localVrlClientFile);
+  await fs.copy(path.resolve(__dirname,'../vrlclient.xml'), rootVrlClientFile);
   await vray.startLocalOls();
   // needed to remove any login caching   
   await folderWatcher.wait30Seconds(); 
