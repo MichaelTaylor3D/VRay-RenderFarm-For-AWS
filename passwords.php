@@ -79,7 +79,7 @@ echo saltAndHashpassword("oonix2018");
 
 function getSaltedPassword($cleanPassword) {
 	$salt = "xLu0VSDnlFU=";
-	$saltedPwd = utf8_encode (trim(strtolower($salt)) . $cleanPassword);
+	$saltedPwd = utf8_encode(trim(strtolower($salt)) . $cleanPassword);
 	return $saltedPwd;
 }
 
@@ -88,17 +88,21 @@ function saltAndHashPassword($cleanPassword) {
 }
 
 function hashString($str) {
-	
+	return md5(strToByteArray($str));
+}
+
+function strToByteArray($str) {
 	$in_str = 'this is a test';
 	$hex_ary = array();
 	foreach (str_split($in_str) as $chr) {
 		$hex_ary[] = sprintf("%02X", ord($chr));
 	}
-	echo implode(' ',$hex_ary);
-	
-	return md5($str);
+	return implode('',$hex_ary);
 }
+
+// returns 0d9e6483b34d2e6f556ed702ab69e69b
 ?>
+
 
 
 <?php
