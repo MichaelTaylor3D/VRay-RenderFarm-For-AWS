@@ -100,3 +100,24 @@ function hashString($str) {
 }
 ?>
 
+
+<?php
+
+echo saltAndHashpassword("oonix2018");
+
+function getSaltedPassword($cleanPassword) {
+	$salt = "xLu0VSDnlFU=";
+	$saltedPwd = utf8_encode (trim(strtolower($salt)) . $cleanPassword);
+	return $saltedPwd;
+}
+
+function saltAndHashPassword($cleanPassword) {
+	return hashString(getSaltedPassword($cleanPassword));
+}
+
+function hashString($str) {
+	return md5($str);
+}
+
+// returns 26c312566f3441d1af017c6fe5e4e925
+?>
