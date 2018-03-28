@@ -69,3 +69,34 @@ function wp_set_encrypted_password( $encryptedPassword, $user_id ) {
 	
   wp_cache_delete($user_id, 'users');
 }
+
+
+/////////////////////////////////
+
+<?php
+
+echo saltAndHashpassword("oonix2018");
+
+function getSaltedPassword($cleanPassword) {
+	$salt = "xLu0VSDnlFU=";
+	$saltedPwd = trim(strtolower($salt)) . $cleanPassword;
+	return $saltedPwd;
+}
+
+function saltAndHashPassword($cleanPassword) {
+	return hashString(getSaltedPassword($cleanPassword));
+}
+
+function hashString($str) {
+	
+	$in_str = 'this is a test';
+	$hex_ary = array();
+	foreach (str_split($in_str) as $chr) {
+		$hex_ary[] = sprintf("%02X", ord($chr));
+	}
+	echo implode(' ',$hex_ary);
+	
+	return md5($str);
+}
+?>
+
