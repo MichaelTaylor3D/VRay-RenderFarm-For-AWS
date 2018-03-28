@@ -79,7 +79,7 @@ echo saltAndHashpassword("oonix2018");
 
 function getSaltedPassword($cleanPassword) {
 	$salt = "xLu0VSDnlFU=";
-	$saltedPwd = trim(strtolower($salt)) . $cleanPassword;
+	$saltedPwd = utf8_encode (trim(strtolower($salt)) . $cleanPassword);
 	return $saltedPwd;
 }
 
