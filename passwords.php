@@ -12,7 +12,7 @@ if ( !function_exists('wp_check_password') ){
         $numDashes = 15;
         $archvisionMd5Length = $md5len + $numDashes;
         if ( strlen($hash) <=  $archvisionMd5Length ) {
-            $check = hash_equals( $hash, $hashedUserInputPassword );
+            $check = hash_equals( $hash, $parsedHashedUserInputPassword );
             /**
              * Filters whether the plaintext password matches the encrypted password.
              *
