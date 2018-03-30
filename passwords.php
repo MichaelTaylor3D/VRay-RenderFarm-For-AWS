@@ -4,13 +4,14 @@ if ( !function_exists('wp_check_password') ){
               
         // If the hash is archvision md5
         $salt = 'xLu0VSDnlFU=';
-        $saltedPassword = $password + $salt;
-        $hashedUserInputPassword = join('-', str_split(md5($saltedPassword), 2));
+        $saltedPassword = $password + (trim(strtolower($salt));
+        $hashedUserInputPassword = shell_exec("AVHashConsole.exe " . $saltedPassword);
+        $parsedHashedUserInputPassword = join('-', str_split($hashedUserInputPassword, 2));
     
         $md5len = 32;
         $numDashes = 15;
-        $archvisionMd5 = $md5len + $numDashes;
-        if ( strlen($hash) <=  $archvisionMd5 ) {
+        $archvisionMd5Length = $md5len + $numDashes;
+        if ( strlen($hash) <=  $archvisionMd5Length ) {
             $check = hash_equals( $hash, $hashedUserInputPassword );
             /**
              * Filters whether the plaintext password matches the encrypted password.
