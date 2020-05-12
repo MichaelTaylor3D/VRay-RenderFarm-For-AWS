@@ -176,9 +176,6 @@ export const createNewOLS = async () => {
         console.log(
           `After about 5 mins frontend will be available at http://${instance.PublicIpAddress}:8080`
         );
-        // console.log(`You may also remote desktop at ${instance.PublicIpAddress}`);
-        // console.log(`    username: Administrator`);
-        // console.log(`    password: cL3$D?zyeLMTF99AAvS*Q3VI;x!A.;(G`);
       }
     });
   });

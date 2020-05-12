@@ -44,10 +44,10 @@ const monitorRenderManager = async () => {
     console.log(cpuUtilization);
     if (cpuUtilization > 99) {
       console.log("CPU Usage really high, scaling to bigger instance");
-      //  await scaleSmaller(InstanceId, InstanceType);
+      await scaleSmaller(InstanceId, InstanceType);
     } else if (cpuUtilization < 1) {
       console.log("CPU usage really low, scaling to lower instance");
-      // await scaleSmaller(InstanceId, InstanceType);
+      await scaleSmaller(InstanceId, InstanceType);
     } else {
       console.log("CPU usage good, maintaining current instance size");
     }
