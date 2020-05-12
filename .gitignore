@@ -5,3 +5,4 @@ service/log/*
 server/tmp/*
 client/build
 client/node_modules
+.env
