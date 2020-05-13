@@ -8,19 +8,21 @@ ETHER ADDRESS: 0x411b4F2dCFE158114d9396A30c625Bf7DefAD880
 
 ---
 
-This project was a fully functional renderfarm that would use your existing V-Ray licenses to build a temporary renderfarm on AWS to render .VRSCENE files.
+This project was a fully functional renderfarm that would use your existing V-Ray licenses to build a temporary render farm on AWS to render .VRSCENE files.
 
 It worked by creating a job queue, and it would continue rendering as long as the job queue had jobs. After about 30 mins of having an empty job queue, the renderfarm would automatically terminate to save money.
 
 The results would automatically be uploaded to S3 and emailed back to you as a download link.
 
-There is a frontend that would be created at the ip address of the main renderfarm node. This could be used to submit jobs to the active farm.
+There is a frontend that would be created at the ip address of the main render farm node. This could be used to submit jobs to the active farm.
 
 While this project is still intact, it relied on AMI images on AWS that are no longer available. If you would like to use this project you will need to build your own AMI images using a linux image with the following software:
 
-- vray standalone
-- the vray online license server
+- V-Ray Standalone
+- the V-Ray Online License Server
 - a clone of this project in the user directory.
+
+The Online License Server (OLS) must be set to autostart when your AMI boots up.
 
 You will also need to make sure some of the file and folder paths match between the linux image and this project.
 
@@ -48,7 +50,7 @@ The project is split between 4 distinct components
 
 ### from the service directory
 
-`node terminate-entire-farm.js` - Immediatly terminates the renderfarm
+`node terminate-entire-farm.js` - Immediately terminates the renderfarm
 
 ## required ENV variables
 
@@ -75,7 +77,7 @@ The project is split between 4 distinct components
   </tr>
   <tr>
     <td>OLS_SECURITY_GROUP_ID</td>
-    <td>The securoty group your AMI is using</td>
+    <td>The security group your AMI is using</td>
   </tr>
   <tr>
     <td>OLS_SUBNET_ID</td>
