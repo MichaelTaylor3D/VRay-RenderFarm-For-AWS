@@ -2,7 +2,7 @@
 
 I am currently not actively developing this project, and am not supporting issues that may arise from its usage. However if someone would like to donate or commision me, I would be willing to pick it back up.
 
-ENS: michaeltaylor3d.eth
+ENS: michael.taylor.dev.eth
 
 ETHER ADDRESS: 0x411b4F2dCFE158114d9396A30c625Bf7DefAD880
 
