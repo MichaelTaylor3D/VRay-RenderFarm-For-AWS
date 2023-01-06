@@ -14,7 +14,7 @@
     "react-form-validator-core": "^0.1.1",
     "react-material-ui-form-validator": "^1.0.1",
     "react-router-dom": "^4.2.2",
-    "react-scripts": "1.0.17",
+    "react-scripts": "5.0.1",
     "react-tap-event-plugin": "^3.0.2",
     "recordrtc": "^5.4.5",
     "superagent": "^3.8.1"
